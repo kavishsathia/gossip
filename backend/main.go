@@ -47,7 +47,7 @@ func main() {
 	r := gin.Default()
 
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://localhost:5173"}
+	config.AllowOrigins = []string{"http://localhost:5173", "https://gossip-web-forum.netlify.app"}
 	config.AllowMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"}
 	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
 	config.AllowCredentials = true
