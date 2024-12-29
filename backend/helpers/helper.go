@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -26,6 +27,33 @@ func OpenDatabase() (*gorm.DB, error) {
 	}
 
 	return db, nil
+}
+
+func OpenRedis() (*redis.Client, error) {
+	dbURL := os.Getenv("REDIS_URL")
+	if dbURL == "" {
+		print("NOT SET")
+		return nil, fmt.Errorf("DATABASE_URL not set")
+	}
+
+	pwd := os.Getenv("REDIS_PWD")
+	if pwd == "" {
+		print("NOT SET")
+		return nil, fmt.Errorf("DATABASE_URL not set")
+	}
+
+	username := os.Getenv("REDIS_USERNAME")
+	if username == "" {
+		print("NOT SET")
+		return nil, fmt.Errorf("DATABASE_URL not set")
+	}
+
+	return redis.NewClient(&redis.Options{
+		Addr:     dbURL,
+		Password: pwd,
+		Username: username,
+		DB:       0,
+	}), nil
 }
 
 func GetUserInfo(c *gin.Context) (interface{}, *User, error) {

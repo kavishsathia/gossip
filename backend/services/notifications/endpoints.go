@@ -7,7 +7,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"github.com/redis/go-redis/v9"
 )
 
 var upgrader = websocket.Upgrader{
@@ -31,11 +30,12 @@ func GetNotifications(c *gin.Context) {
 		return
 	}
 
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "",
-		DB:       0,
-	})
+	rdb, err := helpers.OpenRedis()
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to access the pubsub server"})
+		return
+	}
 
 	defer rdb.Close()
 
@@ -60,11 +60,12 @@ func GetThreadInfo(c *gin.Context) {
 
 	defer conn.Close()
 
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "",
-		DB:       0,
-	})
+	rdb, err := helpers.OpenRedis()
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to access the pubsub server"})
+		return
+	}
 
 	defer rdb.Close()
 

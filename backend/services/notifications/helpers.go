@@ -1,42 +1,45 @@
 package notifications
 
 import (
+	"backend/helpers"
+	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/redis/go-redis/v9"
 )
 
 func SendNotification(c *gin.Context, userId int, message string, origin int) {
-  if origin == userId {
-	return 
+	if origin == userId {
+		return
+	}
+
+	rdb, err := helpers.OpenRedis()
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to access the pubsub server"})
+		return
+	}
+
+	defer rdb.Close()
+
+	err = rdb.Publish(c, strconv.Itoa(userId), message).Err()
+	if err != nil {
+		panic(err)
+	}
 }
-  rdb := redis.NewClient(&redis.Options{
-	  Addr:	  "localhost:6379",
-	  Password: "", 
-	  DB:		  0,  
-  })
-
-  defer rdb.Close()
-
-  err := rdb.Publish(c, strconv.Itoa(userId), message).Err()
-  if err != nil {
-    panic(err)
-  }
-}
-
 
 func SendThreadInfo(c *gin.Context, threadId int, opType string, data int) {
-  rdb := redis.NewClient(&redis.Options{
-	  Addr:	  "localhost:6379",
-	  Password: "", 
-	  DB:		  0,  
-  })
+	rdb, err := helpers.OpenRedis()
 
-  defer rdb.Close()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to access the pubsub server"})
+		return
+	}
 
-  err := rdb.Publish(c, "t" + strconv.Itoa(threadId), opType + ":" + strconv.Itoa(data)).Err()
-  if err != nil {
-    panic(err)
-  }
+	defer rdb.Close()
+
+	err = rdb.Publish(c, "t"+strconv.Itoa(threadId), opType+":"+strconv.Itoa(data)).Err()
+	if err != nil {
+		panic(err)
+	}
 }
