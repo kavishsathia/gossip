@@ -1,5 +1,10 @@
 import { Profile, Thread, ThreadComment } from "./types";
 
+const baseURL =
+  "https://gossip.s6wyfaw6z9q0r.ap-southeast-1.cs.amazonlightsail.com";
+const websocketBaseURL =
+  "wss://gossip.s6wyfaw6z9q0r.ap-southeast-1.cs.amazonlightsail.com";
+
 const request = async (input: RequestInfo | URL, init?: RequestInit) => {
   const response = await fetch(input, { ...init, credentials: "include" });
   if (response.status === 401) {
@@ -9,21 +14,19 @@ const request = async (input: RequestInfo | URL, init?: RequestInit) => {
 };
 
 export async function listThreads(query: string): Promise<Thread[]> {
-  const response = await request(
-    `http://localhost:8080/threads?query=${query}`
-  );
+  const response = await request(`${baseURL}/threads?query=${query}`);
   const json = await response.json();
   return json;
 }
 
 export async function getThread(id: number): Promise<Thread> {
-  const response = await request(`http://localhost:8080/thread/${id}`);
+  const response = await request(`${baseURL}/thread/${id}`);
   const json = await response.json();
   return json;
 }
 
 export async function likeThread(id: number): Promise<Thread> {
-  const response = await request(`http://localhost:8080/thread/${id}/like`, {
+  const response = await request(`${baseURL}/thread/${id}/like`, {
     method: "POST",
   });
   const json = await response.json();
@@ -31,7 +34,7 @@ export async function likeThread(id: number): Promise<Thread> {
 }
 
 export async function unlikeThread(id: number): Promise<Thread> {
-  const response = await request(`http://localhost:8080/thread/${id}/like`, {
+  const response = await request(`${baseURL}/thread/${id}/like`, {
     method: "DELETE",
   });
   const json = await response.json();
@@ -44,7 +47,7 @@ export async function postThread(
   tags: string[],
   image: string
 ): Promise<number> {
-  const response = await request("http://localhost:8080/thread", {
+  const response = await request(`${baseURL}/thread`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -61,7 +64,7 @@ export async function postThread(
 }
 
 export async function listThreadComments(id: number): Promise<ThreadComment[]> {
-  const response = await request(`http://localhost:8080/thread/${id}/comments`);
+  const response = await request(`${baseURL}/thread/${id}/comments`);
   const json = await response.json();
   return json;
 }
@@ -69,9 +72,7 @@ export async function listThreadComments(id: number): Promise<ThreadComment[]> {
 export async function listThreadCommentComments(
   id: number
 ): Promise<ThreadComment[]> {
-  const response = await request(
-    `http://localhost:8080/comment/${id}/comments`
-  );
+  const response = await request(`${baseURL}/comment/${id}/comments`);
   const json = await response.json();
   return json;
 }
@@ -80,7 +81,7 @@ export async function createThreadComment(
   id: number,
   body: string
 ): Promise<boolean> {
-  const response = await request(`http://localhost:8080/thread/${id}/comment`, {
+  const response = await request(`${baseURL}/thread/${id}/comment`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -96,23 +97,20 @@ export async function createThreadCommentComment(
   id: number,
   body: string
 ): Promise<boolean> {
-  const response = await request(
-    `http://localhost:8080/comment/${id}/comment`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        body,
-      }),
-    }
-  );
+  const response = await request(`${baseURL}/comment/${id}/comment`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      body,
+    }),
+  });
   return response.status === 200;
 }
 
 export async function likeThreadComment(id: number): Promise<Thread> {
-  const response = await request(`http://localhost:8080/comment/${id}/like`, {
+  const response = await request(`${baseURL}/comment/${id}/like`, {
     method: "POST",
   });
   const json = await response.json();
@@ -120,7 +118,7 @@ export async function likeThreadComment(id: number): Promise<Thread> {
 }
 
 export async function unlikeThreadComment(id: number): Promise<Thread> {
-  const response = await request(`http://localhost:8080/comment/${id}/like`, {
+  const response = await request(`${baseURL}/comment/${id}/like`, {
     method: "DELETE",
   });
   const json = await response.json();
@@ -131,7 +129,7 @@ export async function createUser(
   username: string,
   password: string
 ): Promise<number> {
-  const response = await request("http://localhost:8080/user", {
+  const response = await request(`${baseURL}/user`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -154,7 +152,7 @@ export async function loginAsUser(
   username: string,
   password: string
 ): Promise<boolean> {
-  const response = await request("http://localhost:8080/user", {
+  const response = await request(`${baseURL}/user`, {
     credentials: "include",
     method: "PUT",
     headers: {
@@ -170,7 +168,7 @@ export async function loginAsUser(
 }
 
 export async function getMe(): Promise<Profile | null> {
-  const response = await request("http://localhost:8080/user", {
+  const response = await request(`${baseURL}/user`, {
     method: "GET",
   });
 
@@ -182,9 +180,17 @@ export async function getMe(): Promise<Profile | null> {
 }
 
 export async function getUser(id: number): Promise<Profile> {
-  const response = await request(`http://localhost:8080/user/${id}`, {
+  const response = await request(`${baseURL}/user/${id}`, {
     method: "GET",
   });
 
   return await response.json();
+}
+
+export function getNotifications(): WebSocket {
+  return new WebSocket(`${websocketBaseURL}/notifications`);
+}
+
+export function getThreadInfo(id: number): WebSocket {
+  return new WebSocket(`${websocketBaseURL}/thread-info/${id}`);
 }

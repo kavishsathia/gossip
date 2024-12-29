@@ -10,6 +10,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func AuthMiddleware() gin.HandlerFunc {
@@ -38,6 +39,10 @@ func AuthMiddleware() gin.HandlerFunc {
 }
 
 func main() {
+	if err := godotenv.Load(); err != nil {
+		print("Error loading environment vars")
+	}
+
 	models.Migrate()
 	r := gin.Default()
 
@@ -51,6 +56,7 @@ func main() {
 
 	r.POST("/user", auth.CreateUser)
 	r.PUT("/user", auth.LoginAsUser)
+	r.GET("/ping", func(c *gin.Context) { c.JSON(http.StatusOK, gin.H{"success": true}) })
 
 	protected := r.Group("")
 	protected.Use(AuthMiddleware())
@@ -76,5 +82,5 @@ func main() {
 		protected.GET("/user/:id", auth.GetUser)
 	}
 
-	r.Run()
+	r.Run(":80")
 }

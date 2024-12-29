@@ -8,7 +8,6 @@ import Thread from "./features/threads/components/Thread.tsx";
 import Editor from "./features/threads/components/Editor.tsx";
 import Sidebar from "./features/threads/components/Sidebar.tsx";
 import { SnackbarProvider } from "notistack";
-import "@mantine/core/styles.css";
 
 createRoot(document.getElementById("root")!).render(
   <SnackbarProvider maxSnack={3} preventDuplicate>

@@ -7,18 +7,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
-	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 func OpenDatabase() (*gorm.DB, error) {
-	if err := godotenv.Load(); err != nil {
-		return nil, err
-	}
-
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
+		print("NOT SET")
 		return nil, fmt.Errorf("DATABASE_URL not set")
 	}
 
@@ -47,10 +43,6 @@ func GetUserInfo(c *gin.Context) (interface{}, *User, error) {
 }
 
 func Verify(tokenString string) (*User, error) {
-	if err := godotenv.Load(); err != nil {
-		return nil, errors.New("error loading environment variables")
-	}
-
 	secretKey := os.Getenv("JWT_SECRET")
 	if secretKey == "" {
 		return nil, errors.New("JWT secret key not found in environment")
@@ -93,10 +85,6 @@ func Verify(tokenString string) (*User, error) {
 }
 
 func Generate(userId int, username string) (string, error) {
-	if err := godotenv.Load(); err != nil {
-		return "", errors.New("error loading environment variables")
-	}
-
 	secret := []byte(os.Getenv("JWT_SECRET"))
 	if len(secret) == 0 {
 		return "", errors.New("JWT private key not found in environment")

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import { Outlet } from "react-router";
-import { getMe } from "../../../services/threads";
+import { getMe, getNotifications } from "../../../services/threads";
 import { Profile } from "../../../services/threads/types";
 import { useSnackbar } from "notistack";
 import { LogOut } from "lucide-react";
@@ -23,7 +23,7 @@ function App() {
 
     fetchMe();
 
-    const ws = new WebSocket("ws://localhost:8080/notifications");
+    const ws = getNotifications();
     ws.onmessage = function (event) {
       console.log(event.data);
       enqueueSnackbar(event.data, {

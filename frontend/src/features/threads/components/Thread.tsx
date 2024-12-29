@@ -15,7 +15,12 @@ import {
 } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
 import { useState } from "react";
-import { getThread, likeThread, unlikeThread } from "../../../services/threads";
+import {
+  getThread,
+  getThreadInfo,
+  likeThread,
+  unlikeThread,
+} from "../../../services/threads";
 import React from "react";
 import { Heart, MessageCircle, Share2 } from "lucide-react";
 import { Thread } from "../../../services/threads/types";
@@ -82,21 +87,9 @@ function App() {
     setLoading(true);
     fetchThreads();
 
-    const ws = new WebSocket("ws://localhost:8080/thread-info/" + String(id));
+    const ws = getThreadInfo(id);
     ws.onmessage = function (event) {
       console.log(event.data);
-      const [type, count] = event.data.split(":");
-      if (type === "like") {
-        setThread((prevThread) => ({
-          ...prevThread,
-          Likes: (prevThread?.Likes || 0) + Number(count),
-        }));
-      } else {
-        setThread((prevThread) => ({
-          ...prevThread,
-          Comments: (prevThread?.Comments || 0) + Number(count),
-        }));
-      }
     };
   }, [id]);
 
