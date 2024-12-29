@@ -81,15 +81,15 @@ func LoginAsUser(c *gin.Context) {
 		return
 	}
 
-	c.SetCookie(
-		"authToken",
-		token,
-		86400,
-		"/",
-		"",
-		true,
-		true,
-	)
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "authToken",
+		Value:    token,
+		MaxAge:   86400,
+		Path:     "/",
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
+	})
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Login successful",

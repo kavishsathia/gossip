@@ -36,11 +36,7 @@ function App() {
     <div className="w-screen h-screen bg-neutral-50 flex flex-col">
       <div className="h-12 w-full flex justify-between items-center border-b-2 border-neutral-200 flex-shrink-0 px-5 bg-neutral-900">
         <LogOut className="rotate-180 text-white" />
-        <img
-          className="h-5 w-auto filter invert"
-          src="/public/logo.png"
-          alt="Logo"
-        />
+        <img className="h-5 w-auto filter invert" src="/logo.png" alt="Logo" />
         <Avatar
           src={me?.ProfileImage}
           sx={{ width: "35px", height: "35px" }}
