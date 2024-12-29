@@ -1,5 +1,6 @@
 import { Profile, Thread, ThreadComment } from "./types";
 
+// Update both
 const baseURL =
   "https://gossip.s6wyfaw6z9q0r.ap-southeast-1.cs.amazonlightsail.com";
 const websocketBaseURL =
