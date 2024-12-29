@@ -10,13 +10,17 @@ import {
 } from "../../../services/threads";
 import UserInfo from "./UserInfo";
 
-function App({ item }: { item: ThreadComment }) {
+function App({ item, index }: { item: ThreadComment; index: number }) {
   const [repliesOpen, setRepliesOpen] = useState<boolean>(false);
   const [liked, setLiked] = useState<boolean>(item.Liked ?? false);
   const [likes, setLikes] = useState<number>(item.Likes ?? 0);
 
   return (
-    <div className="mb-4">
+    <div
+      className={`mb-4 rounded-lg p-5 ${
+        index % 2 === 0 ? "bg-gray-100" : "bg-neutral-50"
+      }`}
+    >
       <div className="flex flex-row space-x-2 items-center">
         <Avatar
           src={item.ProfileImage}
@@ -82,7 +86,6 @@ function App({ item }: { item: ThreadComment }) {
       ) : (
         <div></div>
       )}
-      <hr className="mt-3" />
     </div>
   );
 }

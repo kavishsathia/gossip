@@ -36,23 +36,9 @@ func OpenRedis() (*redis.Client, error) {
 		return nil, fmt.Errorf("DATABASE_URL not set")
 	}
 
-	pwd := os.Getenv("REDIS_PWD")
-	if pwd == "" {
-		print("NOT SET")
-		return nil, fmt.Errorf("DATABASE_URL not set")
-	}
-
-	username := os.Getenv("REDIS_USERNAME")
-	if username == "" {
-		print("NOT SET")
-		return nil, fmt.Errorf("DATABASE_URL not set")
-	}
-
 	return redis.NewClient(&redis.Options{
-		Addr:     dbURL,
-		Password: pwd,
-		Username: username,
-		DB:       0,
+		Addr: dbURL,
+		DB:   0,
 	}), nil
 }
 

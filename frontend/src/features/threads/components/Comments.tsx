@@ -58,7 +58,7 @@ function App({ id, isFromPost }: { id: number | null; isFromPost: boolean }) {
       </div>
       <div className="mt-6">
         {comments?.map((item, index) => (
-          <Comment key={index} item={item}></Comment>
+          <Comment key={index} item={item} index={index}></Comment>
         ))}
       </div>
     </div>

@@ -15,12 +15,7 @@ import {
 } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
 import { useState } from "react";
-import {
-  getThread,
-  getThreadInfo,
-  likeThread,
-  unlikeThread,
-} from "../../../services/threads";
+import { getThread, likeThread, unlikeThread } from "../../../services/threads";
 import React from "react";
 import { Heart, MessageCircle, Share2 } from "lucide-react";
 import { Thread } from "../../../services/threads/types";
@@ -86,11 +81,6 @@ function App() {
 
     setLoading(true);
     fetchThreads();
-
-    const ws = getThreadInfo(id);
-    ws.onmessage = function (event) {
-      console.log(event.data);
-    };
   }, [id]);
 
   if (loading) {
@@ -215,13 +205,14 @@ function App() {
               setThread({
                 ...thread,
                 Liked: false,
+                Likes: thread.Likes - 1,
               });
-              console.log(thread?.Likes || 0 - 1);
               await unlikeThread(thread.ID);
             } else {
               setThread({
                 ...thread!,
                 Liked: true,
+                Likes: thread!.Likes + 1,
               });
               await likeThread(thread!.ID);
             }
@@ -252,7 +243,7 @@ function App() {
           </span>
         </div>
       </div>
-      <div className="w-full pt-8 pb-12 px-8">
+      <div className="w-full pt-8 pb-12 lg:px-8">
         <Comments isFromPost={true} id={id} />
       </div>
       <BRSpeedDial />

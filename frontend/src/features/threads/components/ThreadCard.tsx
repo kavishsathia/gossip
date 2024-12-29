@@ -8,13 +8,30 @@ import {
 import { Thread } from "../../../services/threads/types";
 import { Heart, MessageCircle, Share2 } from "lucide-react";
 import { Link, useSearchParams } from "react-router";
+import { useEffect } from "react";
 
 export default function ThreadCard({ item }: { item: Thread }) {
   const [searchParams] = useSearchParams();
 
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          if (entry.target.classList.contains("opacity-0")) {
+            entry.target.classList.remove("opacity-0");
+            entry.target.classList.add("opacity-100");
+          }
+        }
+      });
+    });
+
+    const fadeInElements = document.querySelectorAll(".fade-in-element");
+    fadeInElements.forEach((element) => observer.observe(element));
+  }, []);
+
   return (
     <Link
-      className="w-full"
+      className="w-full fade-in-element opacity-0 transition-opacity duration-450"
       to={`/thread/${item.ID}?${searchParams.toString()}`}
     >
       <Card
@@ -23,9 +40,12 @@ export default function ThreadCard({ item }: { item: Thread }) {
       >
         <div className="flex gap-2">
           <CardMedia
+            className="hover:scale-120"
             component="img"
             id={`${item.ID}-image`}
-            sx={{ width: 140 }}
+            sx={{
+              width: 140,
+            }}
             image={item.Image || "https://placehold.co/400"}
           />
 
