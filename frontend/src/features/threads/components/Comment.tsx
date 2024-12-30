@@ -75,8 +75,7 @@ function App({ item, index }: { item: ThreadComment; index: number }) {
           <div className="flex justify-center mb-5">
             <div
               onClick={() => setRepliesOpen(false)}
-              className="w-[1px] bg-gray-300
-             hover:bg-gray-600 hover:w-[2px] cursor-pointer"
+              className="w-[1px] bg-gray-300 hover:w-[2px] hover:bg-teal-700 cursor-pointer"
             ></div>
           </div>
           <div className="col-span-11">

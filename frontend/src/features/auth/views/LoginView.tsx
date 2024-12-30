@@ -41,9 +41,8 @@ function App() {
               if (success) {
                 window.location.href = "/";
               } else {
-	      	alert("Your username or password is invalid");
-	      }
-
+                alert("Your username or password is invalid");
+              }
             }}
             variant="contained"
             fullWidth

@@ -31,7 +31,7 @@ function App() {
   }, [search]);
 
   return (
-    <div className="h-[calc(100vh-3rem)] w-full border-r-2 border-neutral-200 p-5 flex flex-col">
+    <div className="bg-teal-50/75 h-[calc(100vh-3rem)] w-full border-r-2 border-neutral-200 p-5 flex flex-col">
       <div className="mb-5">
         <TextField
           value={search}
@@ -65,7 +65,7 @@ function App() {
           <CircularProgress />
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-3 overflow-y-auto">
+        <div className="grid grid-cols-1 gap-3 overflow-y-auto overscroll-contain">
           {threads.map((item, index) => (
             <div key={index}>
               <ThreadCard item={item} />
