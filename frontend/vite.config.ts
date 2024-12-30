@@ -4,5 +4,14 @@ import { VitePWA } from "vite-plugin-pwa";
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), VitePWA({ registerType: "autoUpdate" })],
+  plugins: [
+    react(),
+    VitePWA({
+      registerType: "autoUpdate",
+      manifest: {
+        name: "Uniconn",
+        short_name: "Uniconn",
+      },
+    }),
+  ],
 });
