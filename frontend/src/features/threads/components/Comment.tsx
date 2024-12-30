@@ -18,7 +18,7 @@ function App({ item, index }: { item: ThreadComment; index: number }) {
   return (
     <div
       className={`mb-4 rounded-lg p-5 ${
-        index % 2 === 0 ? "bg-gray-100" : "bg-neutral-50"
+        index % 2 === 0 ? "bg-teal-600/5" : "bg-neutral-50/0"
       }`}
     >
       <div className="flex flex-row space-x-2 items-center">

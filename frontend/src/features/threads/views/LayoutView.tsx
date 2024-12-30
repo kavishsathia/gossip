@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import { Outlet } from "react-router";
-import { getMe, getNotifications } from "../../../services/threads";
+import { signOut, getMe, getNotifications } from "../../../services/threads";
 import { Profile } from "../../../services/threads/types";
 import { useSnackbar } from "notistack";
 import { LogOut } from "lucide-react";
@@ -34,8 +34,8 @@ function App() {
 
   return (
     <div className="w-screen h-screen bg-neutral-50 flex flex-col">
-      <div className="h-12 w-full flex justify-between items-center border-b-2 border-neutral-200 flex-shrink-0 px-5 bg-neutral-900">
-        <LogOut className="rotate-180 text-white" />
+      <div className="h-12 w-full flex justify-between items-center border-b-2 border-neutral-200 flex-shrink-0 px-5 bg-teal-700">
+        <LogOut onClick={signOut} className="rotate-180 text-white cursor-pointer" />
         <img className="h-5 w-auto filter invert" src="/logo.png" alt="Logo" />
         <Avatar
           src={me?.ProfileImage}

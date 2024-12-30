@@ -96,6 +96,23 @@ func LoginAsUser(c *gin.Context) {
 	})
 }
 
+func SignOut(c *gin.Context) {
+
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "authToken",
+		Value:    "",
+		MaxAge:   86400,
+		Path:     "/",
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
+	})
+
+	c.JSON(http.StatusUnauthorized, gin.H{
+		"message": "Log out successful",
+	})
+}
+
 func GetMe(c *gin.Context) {
 	db, err := helpers.OpenDatabase()
 	if err != nil {

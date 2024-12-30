@@ -57,7 +57,7 @@ func main() {
 	r.POST("/user", auth.CreateUser)
 	r.PUT("/user", auth.LoginAsUser)
 	r.GET("/ping", func(c *gin.Context) { c.JSON(http.StatusOK, gin.H{"success": true}) })
-
+	r.GET("/user/sign-out", auth.SignOut)
 	protected := r.Group("")
 	protected.Use(AuthMiddleware())
 	{

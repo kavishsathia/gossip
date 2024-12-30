@@ -101,7 +101,7 @@ function App() {
   }
 
   return (
-    <div className="text-left w-full p-6 py-2">
+    <div className="text-left w-full p-3 lg:p-6 py-2">
       {thread?.Image ? (
         <div className="w-32 h-32 rounded-md m-4 mb-0 mt-6">
           <img

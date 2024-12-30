@@ -7,11 +7,12 @@ import {
 } from "@mui/material";
 import { Thread } from "../../../services/threads/types";
 import { Heart, MessageCircle, Share2 } from "lucide-react";
-import { Link, useSearchParams } from "react-router";
+import { Link, useSearchParams, useParams } from "react-router";
 import { useEffect } from "react";
 
 export default function ThreadCard({ item }: { item: Thread }) {
   const [searchParams] = useSearchParams();
+  const id = Number(useParams().id);
 
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
@@ -35,7 +36,7 @@ export default function ThreadCard({ item }: { item: Thread }) {
       to={`/thread/${item.ID}?${searchParams.toString()}`}
     >
       <Card
-        className="w-full border border-gray-150 hover:shadow-lg transition-shadow duration-200"
+        className={`w-full border ${id === item.ID ? "border-teal-600 border-[1.5px]" : "border-gray-150"} hover:shadow-lg transition-shadow duration-200`}
         elevation={0}
       >
         <div className="flex gap-2">

@@ -229,11 +229,11 @@ function App() {
           right: 16,
           color: "white",
           "& .MuiFab-root": {
-            backgroundColor: "black",
+            backgroundColor: "rgb(15 118 110 / var(--tw-bg-opacity, 1))",
             color: "white",
           },
           "& .MuiFab-root:hover": {
-            backgroundColor: "#333",
+            backgroundColor: "rgb(13 148 136 / var(--tw-bg-opacity, 1))",
           },
         }}
         icon={<Check />}

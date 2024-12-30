@@ -168,6 +168,14 @@ export async function loginAsUser(
   return response.status === 200;
 }
 
+export async function signOut(): Promise<boolean> {
+	const response = await request(`${baseURL}/user/sign-out`, {
+		method: "GET"
+	})
+
+	return response.status === 401;
+}
+
 export async function getMe(): Promise<Profile | null> {
   const response = await request(`${baseURL}/user`, {
     method: "GET",
