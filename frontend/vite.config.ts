@@ -8,9 +8,11 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
+
       manifest: {
         name: "Uniconn",
         short_name: "Uniconn",
+        theme_color: "#0f766e",
       },
     }),
   ],
