@@ -9,6 +9,11 @@ import Editor from "./features/threads/components/Editor.tsx";
 import Sidebar from "./features/threads/components/Sidebar.tsx";
 import { SnackbarProvider } from "notistack";
 
+import "@fontsource/inter/300.css";
+import "@fontsource/inter/400.css";
+import "@fontsource/inter/500.css";
+import "@fontsource/inter/600.css";
+
 createRoot(document.getElementById("root")!).render(
   <SnackbarProvider maxSnack={3} preventDuplicate>
     <BrowserRouter>
