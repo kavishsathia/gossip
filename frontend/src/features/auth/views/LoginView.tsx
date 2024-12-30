@@ -6,10 +6,10 @@ function App() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   return (
-    <div className="h-screen w-screen grid grid-cols-2">
-      <div className="bg-neutral-900 h-screen"></div>
+    <div className="h-screen w-screen grid lg:grid-cols-2">
+      <div className="bg-neutral-900 h-screen hidden lg:block"></div>
       <div className="bg-slate-100 h-screen flex justify-center items-center">
-        <div className="w-3/5 space-y-5">
+        <div className="w-4/5 md:w-2/5 lg:w-3/5 space-y-5">
           <div className="w-full">
             <h1 className="block text-4xl font-semibold w-full mb-2">Login</h1>
             <h3 className="mb-3">Please enter your credentials to continue</h3>
@@ -40,7 +40,10 @@ function App() {
               const success = await loginAsUser(username, password);
               if (success) {
                 window.location.href = "/";
-              }
+              } else {
+	      	alert("Your username or password is invalid");
+	      }
+
             }}
             variant="contained"
             fullWidth
