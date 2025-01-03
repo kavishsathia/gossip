@@ -7,10 +7,13 @@
 
 <div align="center">
 <h1>Uniconn: My Implementation of a Simple Web Forum Application</h1>
-</div>
 
 **Author:** Kavish Sathia  
 **Date:** 3rd January 2025
+
+</div>
+
+
 
 <br>
 
@@ -183,6 +186,7 @@ npm run dev
 
 10. The server will start at localhost:5173. 
 
+<br>
 
 ## Appreciation
 
