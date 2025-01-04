@@ -36,7 +36,11 @@ function App() {
     <div className="w-screen h-screen bg-neutral-50 flex flex-col">
       <div className="h-12 w-full flex justify-between items-center border-b-2 border-neutral-200 flex-shrink-0 px-5 bg-teal-700">
         <LogOut
-          onClick={signOut}
+          onClick={() => {
+            if (confirm("Are you sure you want to sign out?")) {
+              signOut();
+            }
+          }}
           className="rotate-180 text-white cursor-pointer"
         />
         <Link to="/">

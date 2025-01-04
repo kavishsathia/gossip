@@ -13,8 +13,6 @@
 
 </div>
 
-
-
 <br>
 
 ## Table of Contents
@@ -52,9 +50,7 @@ These are the features that I have included in Uniconn. To try out these feature
 - AI-generated descriptions for threads.
 - Communities feature with each community having its own theme and color scheme.
 
-
 <br>
-
 
 ## Tech Stack
 
@@ -73,11 +69,10 @@ The frameworks and languages used follow the assignment guidelines, using React 
 
 I used two databases for this assignment:
 
-1. **PostgreSQL**: To store application data. Threads, comments, and user data are stored here.  
+1. **PostgreSQL**: To store application data. Threads, comments, and user data are stored here.
 2. **Redis**: As the PubSub server to publish and listen to real-time notifications from user activity.
 
 <br>
-
 
 ## User Interface
 
@@ -91,7 +86,6 @@ There are 4 interfaces for larger screens and 5 interfaces for smaller screens. 
 
 <br>
 
-
 ## Data Model
 
 <div align="center">
@@ -100,9 +94,7 @@ There are 4 interfaces for larger screens and 5 interfaces for smaller screens. 
 *Figure: The ERD diagram for Uniconn's relational database.*
 </div>
 
-
 <br>
-
 
 ## Architecture
 
@@ -112,19 +104,18 @@ There are 4 interfaces for larger screens and 5 interfaces for smaller screens. 
 *Figure: The tech architecture for Uniconn.*
 </div>
 
-The architecture consists of 3 segments: the frontend which is hosted on Netlify, 
-the backend which is hosted on AWS Lightsail as a Docker container and the data 
-layer which has two databases, PostgreSQL and Redis. The Redis database is not used 
-for data storage but for its PubSub capabilities. I will now outline how the real time 
-notification system works: For each user, there exists a channel on the Redis server whose 
-name is the user ID of the user to which it corresponds. Every time an action has been 
-taken on a user's post or comment, a message will be published to the channel that 
-corresponds to the user. If the user is connected to the WebSocket endpoint on the Gin 
-backend, the WebSocket endpoint will read the published message and send it to the user 
-through the Websocket connection. When the frontend receives the message, it will display a notification. 
+The architecture consists of 3 segments: the frontend which is hosted on Netlify,
+the backend which is hosted on AWS Lightsail as a Docker container and the data
+layer which has two databases, PostgreSQL and Redis. The Redis database is not used
+for data storage but for its PubSub capabilities. I will now outline how the real time
+notification system works: For each user, there exists a channel on the Redis server whose
+name is the user ID of the user to which it corresponds. Every time an action has been
+taken on a user's post or comment, a message will be published to the channel that
+corresponds to the user. If the user is connected to the WebSocket endpoint on the Gin
+backend, the WebSocket endpoint will read the published message and send it to the user
+through the Websocket connection. When the frontend receives the message, it will display a notification.
 
 <br>
-
 
 ## Challenges
 
@@ -142,28 +133,33 @@ through the Websocket connection. When the frontend receives the message, it wil
 ## Developer Manual
 
 1. Clone this repository. Run:
+
 ```console
 git clone git@github.com:kavishsathia/gossip.git
 ```
 
 2. Change your directory to the backend. Run:
+
 ```console
 cd gossip/backend
 ```
 
-3. Download the required modules. Run: 
+3. Download the required modules. Run:
+
 ```console
 go mod download
 ```
 
 4. Add a .env file. In the .env file, add the following:
-     - DATABASE_URL
-     - JWT_SECRET
-     - REDIS_URL
-     - REDIS_PWD
-     - REDIS_USERNAME
-  
+
+   - DATABASE_URL
+   - JWT_SECRET
+   - REDIS_URL
+   - REDIS_PWD
+   - REDIS_USERNAME
+
 5. Start the server. Run:
+
 ```console
 go run .
 ```
@@ -171,25 +167,27 @@ go run .
 6. Start a new terminal session.
 
 7. Change your directory to the frontend. Run:
+
 ```console
 cd gossip/frontend
 ```
-8. Download the required modules. Run: 
+
+8. Download the required modules. Run:
+
 ```console
 npm install
 ```
 
-9. Start the server. Run: 
+9. Start the server. Run:
+
 ```console
 npm run dev
 ```
 
-10. The server will start at localhost:5173. 
+10. The server will start at localhost:5173.
 
 <br>
 
 ## Appreciation
 
 Thanks to the CVWO Team for this awesome assignment. Although I had some previous experience, this assignment allowed me to fill in the gaps in my knowledge and push my boundaries.
-
-
