@@ -122,7 +122,7 @@ func ListThreads(c *gin.Context) {
         END as liked
     `).
 		Joins(`
-        LEFT JOIN user_thread_likes utl 
+        LEFT JOIN thread_likes utl 
         ON utl.thread_id = threads.id 
         AND utl.user_id = ?
     `, userInfo.UserID)
@@ -202,7 +202,7 @@ func GetThread(c *gin.Context) {
 		return
 	}
 
-	var liked models.UserThreadLikes
+	var liked models.ThreadLike
 	result2 := db.Where("user_id = ? AND thread_id = ?", userInfo.UserID, id).First(&liked)
 	if result2.Error != nil {
 		c.JSON(http.StatusOK, ThreadResponse{
@@ -241,7 +241,7 @@ func LikeThread(c *gin.Context) {
 		return
 	}
 
-	result := db.Create(&models.UserThreadLikes{
+	result := db.Create(&models.ThreadLike{
 		ThreadID: uint(id),
 		UserID:   uint(userInfo.UserID),
 	})
@@ -291,7 +291,7 @@ func UnlikeThread(c *gin.Context) {
 		return
 	}
 
-	result := db.Delete(&models.UserThreadLikes{
+	result := db.Delete(&models.ThreadLike{
 		ThreadID: uint(id),
 		UserID:   uint(userInfo.UserID),
 	})
@@ -334,9 +334,9 @@ func ListThreadComments(c *gin.Context) {
 	}
 
 	var comments []ThreadCommentResponse
-	result := db.Table("user_thread_comments").
+	result := db.Table("thread_comments").
 		Select(`
-        user_thread_comments.*, 
+        thread_comments.*, 
         CASE 
             WHEN utcl.user_id IS NOT NULL THEN true 
             ELSE false 
@@ -346,15 +346,15 @@ func ListThreadComments(c *gin.Context) {
     `).
 		Joins(`
         INNER JOIN users 
-        ON users.id = user_thread_comments.user_id
+        ON users.id = thread_comments.user_id
     `).
 		Joins(`
-        LEFT JOIN user_thread_comment_likes utcl 
-        ON utcl.comment_id = user_thread_comments.id 
+        LEFT JOIN thread_comment_likes utcl 
+        ON utcl.comment_id = thread_comments.id 
         AND utcl.user_id = ?
     `, userInfo.UserID).
 		Where("thread_id = ?", id).
-		Where("user_thread_comments_id = 0").
+		Where("parent_id IS NULL").
 		Find(&comments)
 
 	if result.Error != nil {
@@ -385,9 +385,9 @@ func ListThreadCommentComments(c *gin.Context) {
 	}
 
 	var comments []ThreadCommentResponse
-	result := db.Table("user_thread_comments").
+	result := db.Table("thread_comments").
 		Select(`
-        user_thread_comments.*, 
+        thread_comments.*, 
         CASE 
             WHEN utcl.user_id IS NOT NULL THEN true 
             ELSE false 
@@ -397,14 +397,14 @@ func ListThreadCommentComments(c *gin.Context) {
     `).
 		Joins(`
         INNER JOIN users 
-        ON users.id = user_thread_comments.user_id
+        ON users.id = thread_comments.user_id
     `).
 		Joins(`
-        LEFT JOIN user_thread_comment_likes utcl 
-        ON utcl.comment_id = user_thread_comments.id 
+        LEFT JOIN thread_comment_likes utcl 
+        ON utcl.comment_id = thread_comments.id 
         AND utcl.user_id = ?
     `, userInfo.UserID).
-		Where("user_thread_comments_id = ?", id).
+		Where("parent_id = ?", id).
 		Find(&comments)
 
 	if result.Error != nil {
@@ -440,13 +440,13 @@ func CreateThreadComment(c *gin.Context) {
 		return
 	}
 
-	result := db.Create(&models.UserThreadComments{
-		ThreadID:             uint(id),
-		Comment:              body.Body,
-		UserID:               uint(userInfo.UserID),
-		Likes:                0,
-		Comments:             0,
-		UserThreadCommentsID: 0,
+	result := db.Create(&models.ThreadComment{
+		ThreadID: uint(id),
+		Comment:  body.Body,
+		UserID:   uint(userInfo.UserID),
+		Likes:    0,
+		Comments: 0,
+		ParentID: nil,
 	})
 
 	if result.Error != nil {
@@ -508,17 +508,18 @@ func CreateThreadCommentComment(c *gin.Context) {
 		return
 	}
 
-	var comment models.UserThreadComments
+	var comment models.ThreadComment
 	db.Where("id = ?", id).First(&comment)
 	println(comment.ThreadID)
 
-	result := db.Create(&models.UserThreadComments{
-		ThreadID:             comment.ThreadID,
-		Comment:              body.Body,
-		UserID:               uint(userInfo.UserID),
-		Likes:                0,
-		Comments:             0,
-		UserThreadCommentsID: uint(id),
+	parentId := uint(id)
+	result := db.Create(&models.ThreadComment{
+		ThreadID: comment.ThreadID,
+		Comment:  body.Body,
+		UserID:   uint(userInfo.UserID),
+		Likes:    0,
+		Comments: 0,
+		ParentID: &parentId,
 	})
 
 	if result.Error != nil {
@@ -535,7 +536,7 @@ func CreateThreadCommentComment(c *gin.Context) {
 		return
 	}
 
-	result3 := db.Model(&models.UserThreadComments{}).
+	result3 := db.Model(&models.ThreadComment{}).
 		Where("id = ?", uint(id)).
 		Update("comments", gorm.Expr("comments + ?", 1))
 
@@ -553,7 +554,7 @@ func CreateThreadCommentComment(c *gin.Context) {
 		return
 	}
 
-	var parent models.UserThreadComments
+	var parent models.ThreadComment
 	result5 := db.First(&parent, id)
 
 	if result5.Error != nil {
@@ -583,7 +584,7 @@ func LikeThreadComment(c *gin.Context) {
 		return
 	}
 
-	result := db.Create(&models.UserThreadCommentLikes{
+	result := db.Create(&models.ThreadCommentLike{
 		CommentID: uint(id),
 		UserID:    uint(userInfo.UserID),
 	})
@@ -593,7 +594,7 @@ func LikeThreadComment(c *gin.Context) {
 		return
 	}
 
-	result2 := db.Model(&models.UserThreadComments{}).
+	result2 := db.Model(&models.ThreadComment{}).
 		Where("id = ?", id).
 		Update("likes", gorm.Expr("likes + ?", 1))
 
@@ -602,7 +603,7 @@ func LikeThreadComment(c *gin.Context) {
 		return
 	}
 
-	var comment models.UserThreadComments
+	var comment models.ThreadComment
 	result3 := db.First(&comment, id)
 
 	if result3.Error != nil {
@@ -633,7 +634,7 @@ func UnlikeThreadComment(c *gin.Context) {
 		return
 	}
 
-	result := db.Delete(&models.UserThreadCommentLikes{
+	result := db.Delete(&models.ThreadCommentLike{
 		CommentID: uint(id),
 		UserID:    uint(userInfo.UserID),
 	})
@@ -643,7 +644,7 @@ func UnlikeThreadComment(c *gin.Context) {
 		return
 	}
 
-	result2 := db.Model(&models.UserThreadComments{}).
+	result2 := db.Model(&models.ThreadComment{}).
 		Where("id = ?", id).
 		Update("likes", gorm.Expr("likes - ?", 1))
 

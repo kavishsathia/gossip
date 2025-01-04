@@ -1,10 +1,9 @@
 import { Profile, Thread, ThreadComment } from "./types";
 
 // Update both
-const baseURL =
-  "https://gossip.s6wyfaw6z9q0r.ap-southeast-1.cs.amazonlightsail.com";
-const websocketBaseURL =
-  "wss://gossip.s6wyfaw6z9q0r.ap-southeast-1.cs.amazonlightsail.com";
+const baseURL = import.meta.env.VITE_BASE_URL;
+console.log(baseURL);
+const websocketBaseURL = import.meta.env.VITE_WEBSOCKET_BASE_URL;
 
 const request = async (input: RequestInfo | URL, init?: RequestInit) => {
   const response = await fetch(input, { ...init, credentials: "include" });
@@ -153,7 +152,7 @@ export async function loginAsUser(
   username: string,
   password: string
 ): Promise<boolean> {
-  const response = await request(`${baseURL}/user`, {
+  const response = await request(`${baseURL}/user/sign-in`, {
     credentials: "include",
     method: "PUT",
     headers: {
@@ -169,15 +168,15 @@ export async function loginAsUser(
 }
 
 export async function signOut(): Promise<boolean> {
-	const response = await request(`${baseURL}/user/sign-out`, {
-		method: "GET"
-	})
+  const response = await request(`${baseURL}/user/sign-out`, {
+    method: "GET",
+  });
 
-	return response.status === 401;
+  return response.status === 401;
 }
 
 export async function getMe(): Promise<Profile | null> {
-  const response = await request(`${baseURL}/user`, {
+  const response = await request(`${baseURL}/user/me`, {
     method: "GET",
   });
 

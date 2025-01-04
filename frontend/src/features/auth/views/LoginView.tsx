@@ -80,12 +80,29 @@ function App() {
           >
             Sign Up
           </Button>
-          <p>
-            Oops!{" "}
-            <a className="cursor-pointer text-neutral-600 hover:text-neutral-900 hover:underline">
-              Forgot your password?
-            </a>
-          </p>
+          <Button
+            id="login"
+            onClick={async () => {
+              const success = await loginAsUser("anonymous", "");
+              if (success) {
+                window.location.href = "/";
+              } else {
+                alert("Your username or password is invalid");
+              }
+            }}
+            variant="contained"
+            fullWidth
+            disableElevation
+            style={{ textTransform: "none" }}
+            sx={{
+              bgcolor: "black",
+              "&:hover": {
+                bgcolor: "#333",
+              },
+            }}
+          >
+            Lurk
+          </Button>
         </div>
       </div>
     </div>

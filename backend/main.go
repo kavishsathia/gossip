@@ -23,7 +23,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			})
 			return
 		}
-		print(2)
+
 		user, err := helpers.Verify(token.Value)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
@@ -33,6 +33,12 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		c.Set("user", user)
+
+		if user.UserID == 0 && c.Request.Method != "GET" {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"error": "Unauthorized: You're lurking lol",
+			})
+		}
 
 		c.Next()
 	}
@@ -55,7 +61,7 @@ func main() {
 	r.Use(cors.New(config))
 
 	r.POST("/user", auth.CreateUser)
-	r.PUT("/user", auth.LoginAsUser)
+	r.PUT("/user/sign-in", auth.LoginAsUser)
 	r.GET("/ping", func(c *gin.Context) { c.JSON(http.StatusOK, gin.H{"success": true}) })
 	r.GET("/user/sign-out", auth.SignOut)
 	protected := r.Group("")
@@ -78,7 +84,7 @@ func main() {
 
 		protected.GET("/notifications", notifications.GetNotifications)
 		protected.GET("/thread-info/:id", notifications.GetThreadInfo)
-		protected.GET("/user", auth.GetMe)
+		protected.GET("/user/me", auth.GetMe)
 		protected.GET("/user/:id", auth.GetUser)
 	}
 
