@@ -24,6 +24,7 @@ import { Avatar, Box, CircularProgress } from "@mui/material";
 import { Link, useParams, useSearchParams } from "react-router";
 import UserInfo from "./UserInfo";
 import BRSpeedDial from "../components/BRSpeedDial";
+import Welcome from "./Welcome";
 
 const padNumber = (num: number) => num.toString().padStart(2, "0");
 
@@ -58,7 +59,6 @@ function App() {
   const [thread, setThread] = useState<Thread>();
   const [loading, setLoading] = React.useState(true);
 
-  // Define supported languages
   const languages = {
     js: "JavaScript",
     jsx: "React",
@@ -98,6 +98,10 @@ function App() {
         <CircularProgress size={60} thickness={5} sx={{ color: "#1976d2" }} />
       </Box>
     );
+  }
+
+  if (!thread?.ID) {
+    return <Welcome />;
   }
 
   return (

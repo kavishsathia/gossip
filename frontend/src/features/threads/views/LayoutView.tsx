@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
-import { Outlet } from "react-router";
+import { Link, Outlet } from "react-router";
 import { signOut, getMe, getNotifications } from "../../../services/threads";
 import { Profile } from "../../../services/threads/types";
 import { useSnackbar } from "notistack";
@@ -39,7 +39,9 @@ function App() {
           onClick={signOut}
           className="rotate-180 text-white cursor-pointer"
         />
-        <img className="h-6 w-auto" src="/logo.png" alt="Logo" />
+        <Link to="/">
+          <img className="h-6 w-auto" src="/logo.png" alt="Logo" />
+        </Link>
         <Avatar
           src={me?.ProfileImage}
           sx={{ width: "35px", height: "35px" }}

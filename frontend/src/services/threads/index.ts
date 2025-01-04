@@ -2,13 +2,16 @@ import { Profile, Thread, ThreadComment } from "./types";
 
 // Update both
 const baseURL = import.meta.env.VITE_BASE_URL;
-console.log(baseURL);
 const websocketBaseURL = import.meta.env.VITE_WEBSOCKET_BASE_URL;
 
 const request = async (input: RequestInfo | URL, init?: RequestInit) => {
   const response = await fetch(input, { ...init, credentials: "include" });
   if (response.status === 401) {
     window.location.href = "/login";
+  }
+
+  if (response.status > 499) {
+    window.location.href = `/error?status=${"Internal Server Error"}&status-text=${"My bad bruh, lemme fix that"}`;
   }
   return response;
 };

@@ -4,6 +4,7 @@ import { listThreads } from "../../../services/threads";
 import { Thread } from "../../../services/threads/types";
 import ThreadCard from "../components/ThreadCard";
 import { useSearchParams } from "react-router";
+import { Ghost } from "lucide-react";
 
 function App() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -36,7 +37,7 @@ function App() {
         <TextField
           value={search}
           id="search"
-          label="Search"
+          label="Search for keywords, #tags or @"
           variant="outlined"
           className="w-full"
           fullWidth
@@ -63,6 +64,13 @@ function App() {
       {loading ? (
         <div className="w-full flex justify-center h-full items-center">
           <CircularProgress />
+        </div>
+      ) : threads.length === 0 ? (
+        <div className="text-xl text-center flex flex-col items-center h-full justify-center">
+          <Ghost className="size-12" />
+          <span className="mt-3 w-2/3">
+            Hmm, nothing here yet! Why not start the conversation?
+          </span>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-3 overflow-y-auto overscroll-contain">
