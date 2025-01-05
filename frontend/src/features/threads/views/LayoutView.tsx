@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import { Link, Outlet } from "react-router";
-import { signOut, getMe, getNotifications } from "../../../services/threads";
-import { Profile } from "../../../services/threads/types";
+import { signOut, getMe } from "../../../services/auth";
+import { Profile } from "../../../services/auth/types";
 import { useSnackbar } from "notistack";
 import { LogOut } from "lucide-react";
 import { Avatar } from "@mui/material";
 import { User } from "../context";
+import { getNotifications } from "../../../services/notifications";
 
 function App() {
   const [me, setMe] = useState<Profile>();
@@ -31,7 +32,7 @@ function App() {
         preventDuplicate: true,
       });
     };
-  }, []);
+  }, [enqueueSnackbar]);
 
   if (!me) {
     return <div />;

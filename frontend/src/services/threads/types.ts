@@ -21,28 +21,3 @@ export interface ThreadTag {
   ThreadID: number;
   Tag: string;
 }
-
-export interface ThreadComment {
-  ID: number;
-  Comment: string;
-  ThreadID: string | null;
-  UserID: number;
-  Likes: number;
-  Comments: number;
-  CreatedAt: string;
-  UpdatedAt: string;
-  Liked: boolean | null;
-  Username: string;
-  ProfileImage: string;
-  Deleted: boolean;
-}
-
-export interface Profile {
-  ID: number;
-  Username: string;
-  Posts: number;
-  Comments: number;
-  Aura: number;
-  CreatedAt: string;
-  ProfileImage: string;
-}

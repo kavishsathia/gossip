@@ -1,6 +1,6 @@
 import "@mdxeditor/editor/style.css";
 import { useContext, useState } from "react";
-import { ThreadComment } from "../../../services/threads/types";
+import { ThreadComment } from "../../../services/comments/types";
 import { Avatar, Button, IconButton, TextField } from "@mui/material";
 import { Heart, MessageCircle, PencilIcon, Trash } from "lucide-react";
 import Comments from "../components/Comments";
@@ -9,7 +9,7 @@ import {
   editThreadComment,
   likeThreadComment,
   unlikeThreadComment,
-} from "../../../services/threads";
+} from "../../../services/comments";
 import UserInfo from "./UserInfo";
 import { User } from "../context";
 

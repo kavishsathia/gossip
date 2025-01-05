@@ -1,7 +1,7 @@
 import { Avatar, Box, Button, Modal, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { getUser } from "../../../services/threads";
-import { Profile } from "../../../services/threads/types";
+import { getUser } from "../../../services/auth";
+import { Profile } from "../../../services/auth/types";
 import { dateTranslate } from "./Thread";
 import { useSearchParams } from "react-router";
 

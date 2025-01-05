@@ -4,6 +4,7 @@ import (
 	"backend/helpers"
 	"backend/models"
 	"backend/services/auth"
+	"backend/services/comments"
 	"backend/services/notifications"
 	"backend/services/threads"
 	"net/http"
@@ -75,16 +76,16 @@ func main() {
 		protected.DELETE("/thread/:id", threads.DeleteThread)
 		protected.PUT("/thread/:id", threads.EditThread)
 
-		protected.GET("/thread/:id/comments", threads.ListThreadComments)
-		protected.POST("/thread/:id/comment", threads.CreateThreadComment)
-		protected.PUT("/comment/:id", threads.EditThreadComment)
+		protected.GET("/thread/:id/comments", comments.ListThreadComments)
+		protected.POST("/thread/:id/comment", comments.CreateThreadComment)
+		protected.PUT("/comment/:id", comments.EditThreadComment)
 
-		protected.GET("/comment/:id/comments", threads.ListThreadCommentComments)
-		protected.POST("/comment/:id/comment", threads.CreateThreadCommentComment)
-		protected.DELETE("/comment/:id", threads.DeleteThreadComment)
+		protected.GET("/comment/:id/comments", comments.ListThreadCommentComments)
+		protected.POST("/comment/:id/comment", comments.CreateThreadCommentComment)
+		protected.DELETE("/comment/:id", comments.DeleteThreadComment)
 
-		protected.POST("/comment/:id/like", threads.LikeThreadComment)
-		protected.DELETE("/comment/:id/like", threads.UnlikeThreadComment)
+		protected.POST("/comment/:id/like", comments.LikeThreadComment)
+		protected.DELETE("/comment/:id/like", comments.UnlikeThreadComment)
 
 		protected.GET("/notifications", notifications.GetNotifications)
 		protected.GET("/thread-info/:id", notifications.GetThreadInfo)

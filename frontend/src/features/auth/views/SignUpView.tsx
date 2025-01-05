@@ -1,6 +1,6 @@
 import { Button, TextField } from "@mui/material";
 import { useState } from "react";
-import { createUser } from "../../../services/threads";
+import { createUser } from "../../../services/auth";
 
 function isStrongPassword(password: string) {
   const minLength = 8;

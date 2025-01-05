@@ -5,9 +5,9 @@ import {
   createThreadCommentComment,
   listThreadCommentComments,
   listThreadComments,
-} from "../../../services/threads";
+} from "../../../services/comments";
 import React from "react";
-import { ThreadComment } from "../../../services/threads/types";
+import { ThreadComment } from "../../../services/comments/types";
 import Comment from "../components/Comment";
 import { TextField } from "@mui/material";
 

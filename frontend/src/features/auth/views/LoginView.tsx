@@ -1,6 +1,6 @@
 import { Button, TextField } from "@mui/material";
 import { useState } from "react";
-import { loginAsUser } from "../../../services/threads";
+import { loginAsUser } from "../../../services/auth";
 
 function App() {
   const [username, setUsername] = useState("");
