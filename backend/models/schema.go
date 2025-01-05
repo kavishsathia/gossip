@@ -20,6 +20,7 @@ type Thread struct {
 	Image       string
 	Comments    uint `gorm:"default:0"`
 	Shares      uint `gorm:"default:0"`
+	Deleted     bool `gorm:"default:false"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 
@@ -64,6 +65,7 @@ type ThreadComment struct {
 	Likes     uint
 	Comments  uint
 	ParentID  *uint
+	Deleted   bool `gorm:"default:false"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 

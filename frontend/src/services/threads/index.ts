@@ -28,6 +28,37 @@ export async function getThread(id: number): Promise<Thread> {
   return json;
 }
 
+export async function deleteThread(id: number) {
+  const response = await request(`${baseURL}/thread/${id}`, {
+    method: "DELETE",
+  });
+  const json = await response.json();
+  return json;
+}
+
+export async function editThread(
+  id: number,
+  title: string,
+  body: string,
+  tags: string[],
+  image: string
+) {
+  const response = await request(`${baseURL}/thread/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      title,
+      body,
+      tags,
+      image,
+    }),
+  });
+  const json = await response.json();
+  return json;
+}
+
 export async function likeThread(id: number): Promise<Thread> {
   const response = await request(`${baseURL}/thread/${id}/like`, {
     method: "POST",
@@ -123,6 +154,31 @@ export async function likeThreadComment(id: number): Promise<Thread> {
 export async function unlikeThreadComment(id: number): Promise<Thread> {
   const response = await request(`${baseURL}/comment/${id}/like`, {
     method: "DELETE",
+  });
+  const json = await response.json();
+  return json;
+}
+
+export async function deleteThreadComment(id: number): Promise<Thread> {
+  const response = await request(`${baseURL}/comment/${id}`, {
+    method: "DELETE",
+  });
+  const json = await response.json();
+  return json;
+}
+
+export async function editThreadComment(
+  id: number,
+  body: string
+): Promise<Thread> {
+  const response = await request(`${baseURL}/comment/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      body,
+    }),
   });
   const json = await response.json();
   return json;

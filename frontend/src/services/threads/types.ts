@@ -14,6 +14,7 @@ export interface Thread {
   Username: string;
   Image: string | null;
   ProfileImage: string | null;
+  Deleted: boolean;
 }
 
 export interface ThreadTag {
@@ -33,10 +34,11 @@ export interface ThreadComment {
   Liked: boolean | null;
   Username: string;
   ProfileImage: string;
+  Deleted: boolean;
 }
 
 export interface Profile {
-  UserID: number;
+  ID: number;
   Username: string;
   Posts: number;
   Comments: number;

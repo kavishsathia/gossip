@@ -26,7 +26,9 @@ import {
 } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
 import {
+  Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -35,20 +37,22 @@ import {
   SpeedDial,
   TextField,
 } from "@mui/material";
-import { useState } from "react";
-import { postThread } from "../../../services/threads";
+import { useEffect, useState } from "react";
+import { editThread, getThread, postThread } from "../../../services/threads";
 import { Check, Upload } from "lucide-react";
 import { Add, Cancel } from "@mui/icons-material";
+import { useParams } from "react-router";
 
 function App() {
+  const id = Number(useParams().id) || undefined;
   const [markdown, setMarkdown] = useState("");
   const [title, setTitle] = useState("Untitled Thread");
   const [image, setImage] = useState("https://placehold.co/400");
   const [imageBuffer, setImageBuffer] = useState("");
   const [imageModal, setImageModal] = useState(false);
   const [tags, setTags] = useState(["gossip"]);
+  const [loading, setLoading] = useState(false);
 
-  // Define supported languages
   const languages = {
     js: "JavaScript",
     jsx: "React",
@@ -59,6 +63,39 @@ function App() {
     css: "CSS",
     html: "HTML",
   };
+
+  useEffect(() => {
+    if (id) {
+      const fetchThreads = async () => {
+        const data = await getThread(id);
+        setTags(data.ThreadTags.map((item) => item.Tag));
+        setMarkdown(data.Body);
+        setImage(data.Image ?? "https://placehold.co/400");
+        setTitle(data.Title);
+        setLoading(false);
+      };
+
+      setLoading(true);
+      fetchThreads();
+    }
+  }, [id]);
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+          backgroundColor: "#f9fafb",
+        }}
+      >
+        <CircularProgress size={60} thickness={5} sx={{ color: "#1976d2" }} />
+      </Box>
+    );
+  }
 
   return (
     <div className="text-left w-full p-4 pt-6">
@@ -214,13 +251,13 @@ function App() {
       <SpeedDial
         ariaLabel="SpeedDial basic example"
         onClick={async () => {
-          const id = await postThread(
-            title,
-            `# ${title}\n` + markdown,
-            tags,
-            image
-          );
-          window.location.href = `/thread/${id}`;
+          if (id) {
+            await editThread(id, title, markdown, tags, image);
+            window.location.href = `/thread/${id}`;
+          } else {
+            const id = await postThread(title, markdown, tags, image);
+            window.location.href = `/thread/${id}`;
+          }
         }}
         className="p-6"
         sx={{

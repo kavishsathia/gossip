@@ -72,12 +72,16 @@ func main() {
 		protected.GET("/thread/:id", threads.GetThread)
 		protected.POST("/thread/:id/like", threads.LikeThread)
 		protected.DELETE("/thread/:id/like", threads.UnlikeThread)
+		protected.DELETE("/thread/:id", threads.DeleteThread)
+		protected.PUT("/thread/:id", threads.EditThread)
 
 		protected.GET("/thread/:id/comments", threads.ListThreadComments)
 		protected.POST("/thread/:id/comment", threads.CreateThreadComment)
+		protected.PUT("/comment/:id", threads.EditThreadComment)
 
 		protected.GET("/comment/:id/comments", threads.ListThreadCommentComments)
 		protected.POST("/comment/:id/comment", threads.CreateThreadCommentComment)
+		protected.DELETE("/comment/:id", threads.DeleteThreadComment)
 
 		protected.POST("/comment/:id/like", threads.LikeThreadComment)
 		protected.DELETE("/comment/:id/like", threads.UnlikeThreadComment)

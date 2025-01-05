@@ -14,10 +14,15 @@ import {
   frontmatterPlugin,
 } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
-import { useState } from "react";
-import { getThread, likeThread, unlikeThread } from "../../../services/threads";
+import { useContext, useState } from "react";
+import {
+  deleteThread,
+  getThread,
+  likeThread,
+  unlikeThread,
+} from "../../../services/threads";
 import React from "react";
-import { Heart, MessageCircle, Share2 } from "lucide-react";
+import { Heart, MessageCircle, PencilIcon, Share2, Trash } from "lucide-react";
 import { Thread } from "../../../services/threads/types";
 import Comments from "./Comments";
 import { Avatar, Box, CircularProgress } from "@mui/material";
@@ -25,6 +30,7 @@ import { Link, useParams, useSearchParams } from "react-router";
 import UserInfo from "./UserInfo";
 import BRSpeedDial from "../components/BRSpeedDial";
 import Welcome from "./Welcome";
+import { User } from "../context";
 
 const padNumber = (num: number) => num.toString().padStart(2, "0");
 
@@ -58,6 +64,7 @@ function App() {
   const [markdown, setMarkdown] = useState(``);
   const [thread, setThread] = useState<Thread>();
   const [loading, setLoading] = React.useState(true);
+  const user = useContext(User);
 
   const languages = {
     js: "JavaScript",
@@ -74,7 +81,7 @@ function App() {
     const fetchThreads = async () => {
       const data = await getThread(id);
       console.log(222);
-      setMarkdown(data.Body);
+      setMarkdown("# " + data.Title + "\n" + data.Body);
       setThread(data);
       setLoading(false);
     };
@@ -106,16 +113,35 @@ function App() {
 
   return (
     <div className="text-left w-full p-3 lg:p-6 py-2">
-      {thread?.Image ? (
+      <div className="flex flex-row justify-between items-start">
         <div className="w-32 h-32 rounded-md m-4 mb-0 mt-6">
           <img
             className="w-full h-full object-cover rounded-md"
             src={thread?.Image || "https://placehold.co/400"}
           ></img>
         </div>
-      ) : (
-        <></>
-      )}
+        {thread.UserID === user?.ID && !thread.Deleted ? (
+          <div className="flex flex-row space-x-2 items-center m-4 mt-6 pr-5">
+            <Link to={`/editor/${thread.ID}`}>
+              <PencilIcon className="size-5 hover:text-teal-500 cursor-pointer" />
+            </Link>
+
+            <Trash
+              onClick={() => {
+                if (confirm("Are you sure?")) {
+                  deleteThread(thread.ID);
+                  setMarkdown(thread.Title + "\n" + "[deleted]");
+                  window.location.reload();
+                }
+              }}
+              className="size-5 hover:text-red-500 cursor-pointer"
+            />
+          </div>
+        ) : (
+          <div />
+        )}
+      </div>
+
       {thread && markdown && (
         <MDXEditor
           key={id}

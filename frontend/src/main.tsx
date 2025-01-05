@@ -26,6 +26,7 @@ createRoot(document.getElementById("root")!).render(
         <Route path="/" element={<Layout />}>
           <Route path="/thread/:id" element={<Thread />} />
           <Route path="/editor" element={<Editor />} />
+          <Route path="/editor/:id" element={<Editor />} />
           <Route path="/error" element={<Error />} />
           <Route
             path="/"

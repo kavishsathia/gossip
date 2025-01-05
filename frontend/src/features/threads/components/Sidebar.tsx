@@ -37,7 +37,7 @@ function App() {
         <TextField
           value={search}
           id="search"
-          label="Search for keywords, #tags or @"
+          label="Search for keywords, #tags or @people"
           variant="outlined"
           className="w-full"
           fullWidth

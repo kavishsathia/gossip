@@ -188,6 +188,7 @@ func GetThread(c *gin.Context) {
         threads.updated_at, 
         threads.image, 
         username, 
+		deleted,
         profile_image
     `).
 		Joins(`
@@ -220,6 +221,108 @@ func GetThread(c *gin.Context) {
 		ProfileImage: thread.ProfileImage,
 		Liked:        true,
 	})
+}
+
+func DeleteThread(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Missing id or non-integer id"})
+		return
+	}
+
+	db, err := helpers.OpenDatabase()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to database"})
+		return
+	}
+
+	_, userInfo, err := helpers.GetUserInfo(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	result := db.Debug().Model(&models.Thread{}).
+		Where("id = ?", id).
+		Where("user_id = ?", userInfo.UserID).
+		Updates(map[string]interface{}{
+			"deleted": true,
+			"body":    "[deleted]",
+		})
+
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete comment"})
+		return
+	}
+
+	if result.RowsAffected == 0 {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Failed to delete comment"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true})
+}
+
+func EditThread(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Missing id or non-integer id"})
+		return
+	}
+
+	var body ThreadCreationForm
+	if err := c.BindJSON(&body); err != nil {
+		print(err)
+		return
+	}
+
+	db, err := helpers.OpenDatabase()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to database"})
+		return
+	}
+
+	_, userInfo, err := helpers.GetUserInfo(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	var thread models.Thread
+	result := db.Model(&thread).
+		Where("id = ?", id).
+		Where("user_id = ?", userInfo.UserID).
+		Updates(map[string]interface{}{
+			"title": body.Title,
+			"body":  body.Body,
+			"image": body.Image,
+		})
+
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to edit thread"})
+		return
+	}
+
+	if result.RowsAffected == 0 {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Failed to edit thread"})
+		return
+	}
+
+	result2 := db.Where("thread_id = ?", id).Delete(&models.ThreadTag{})
+
+	if result2.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to edit thread"})
+		return
+	}
+
+	for _, value := range body.Tags {
+		db.Create(&models.ThreadTag{
+			ThreadID: uint(id),
+			Tag:      value,
+		})
+	}
+
+	c.JSON(http.StatusOK, gin.H{"ThreadID": thread.ID})
 }
 
 func LikeThread(c *gin.Context) {
@@ -336,7 +439,16 @@ func ListThreadComments(c *gin.Context) {
 	var comments []ThreadCommentResponse
 	result := db.Table("thread_comments").
 		Select(`
-        thread_comments.*, 
+        thread_comments.id,
+		thread_comments.user_id, 
+		thread_comments.thread_id, 
+		thread_comments.comments, 
+		thread_comments.likes, 
+		thread_comments.comment, 
+		thread_comments.parent_id, 
+		thread_comments.deleted, 
+		thread_comments.created_at, 
+		thread_comments.updated_at, 
         CASE 
             WHEN utcl.user_id IS NOT NULL THEN true 
             ELSE false 
@@ -387,7 +499,16 @@ func ListThreadCommentComments(c *gin.Context) {
 	var comments []ThreadCommentResponse
 	result := db.Table("thread_comments").
 		Select(`
-        thread_comments.*, 
+        thread_comments.id,
+		thread_comments.user_id, 
+		thread_comments.thread_id, 
+		thread_comments.comments, 
+		thread_comments.likes, 
+		thread_comments.comment, 
+		thread_comments.parent_id, 
+		thread_comments.deleted, 
+		thread_comments.created_at, 
+		thread_comments.updated_at, 
         CASE 
             WHEN utcl.user_id IS NOT NULL THEN true 
             ELSE false 
@@ -555,10 +676,23 @@ func CreateThreadCommentComment(c *gin.Context) {
 	}
 
 	var parent models.ThreadComment
-	result5 := db.First(&parent, id)
+	result5 := db.Table("thread_comments").
+		Select(`
+        thread_comments.id,
+		thread_comments.user_id, 
+		thread_comments.thread_id, 
+		thread_comments.comments, 
+		thread_comments.likes, 
+		thread_comments.comment, 
+		thread_comments.parent_id, 
+		thread_comments.deleted, 
+		thread_comments.created_at, 
+		thread_comments.updated_at
+    `)
 
 	if result5.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch threads"})
+		return
 	}
 
 	notifications.SendNotification(c, int(parent.UserID), userInfo.Username+" replied to your comment", userInfo.UserID)
@@ -604,10 +738,23 @@ func LikeThreadComment(c *gin.Context) {
 	}
 
 	var comment models.ThreadComment
-	result3 := db.First(&comment, id)
+	result3 := db.Table("thread_comments").
+		Select(`
+        thread_comments.id,
+		thread_comments.user_id, 
+		thread_comments.thread_id, 
+		thread_comments.comments, 
+		thread_comments.likes, 
+		thread_comments.comment, 
+		thread_comments.parent_id, 
+		thread_comments.deleted, 
+		thread_comments.created_at, 
+		thread_comments.updated_at
+    `)
 
 	if result3.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to like comment"})
+		return
 	}
 
 	notifications.SendNotification(c, int(comment.UserID), userInfo.Username+" liked your comment", userInfo.UserID)
@@ -650,6 +797,86 @@ func UnlikeThreadComment(c *gin.Context) {
 
 	if result2.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to unlike comment"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true})
+}
+
+func DeleteThreadComment(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Missing id or non-integer id"})
+		return
+	}
+
+	db, err := helpers.OpenDatabase()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to database"})
+		return
+	}
+
+	_, userInfo, err := helpers.GetUserInfo(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	result := db.Model(&models.ThreadComment{}).
+		Where("id = ?", id).
+		Where("user_id = ?", userInfo.UserID).
+		Update("deleted", true).
+		Update("comment", "[deleted]")
+
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete comment"})
+		return
+	}
+
+	if result.RowsAffected == 0 {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Failed to delete comment"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true})
+}
+
+func EditThreadComment(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Missing id or non-integer id"})
+		return
+	}
+
+	var body CommentCreationForm
+	if err := c.BindJSON(&body); err != nil {
+		return
+	}
+
+	db, err := helpers.OpenDatabase()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to database"})
+		return
+	}
+
+	_, userInfo, err := helpers.GetUserInfo(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	result := db.Model(&models.ThreadComment{}).
+		Where("id = ?", id).
+		Where("user_id = ?", userInfo.UserID).
+		Update("comment", body.Body)
+
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete comment"})
+		return
+	}
+
+	if result.RowsAffected == 0 {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Failed to delete comment"})
 		return
 	}
 
