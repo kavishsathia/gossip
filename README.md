@@ -1,9 +1,11 @@
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/0e7c0eb9-bc2d-4b53-ad0f-ab35ec3b11c8" alt="logo" width="500" />
+  <img width="550" alt="Screenshot 2025-01-07 at 20 43 32" src="https://github.com/user-attachments/assets/292a93b0-6ea9-4680-9f43-0d77b4cba63a" />
   <br><br>
   
   [![Netlify Status](https://api.netlify.com/api/v1/badges/f8790419-0f6c-4023-baf0-ac9bb15e8179/deploy-status)](https://app.netlify.com/sites/uniconnweb/deploys)
 </div>
+
+
 
 <div align="center">
 <h1>Uniconn: My Implementation of a Simple Web Forum Application</h1>
