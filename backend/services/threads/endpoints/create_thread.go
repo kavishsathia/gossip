@@ -30,15 +30,23 @@ func CreateThread(c *gin.Context) {
 		return
 	}
 
+	flag, err := helpers.Moderate(c, body.Body)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to moderate"})
+		return
+	}
+
 	thread := &models.Thread{
-		Title:       body.Title,
-		Description: "",
-		Image:       body.Image,
-		Body:        body.Body,
-		UserID:      uint(userInfo.UserID),
-		Likes:       0,
-		Comments:    0,
-		Shares:      0,
+		Title:          body.Title,
+		Description:    "",
+		Image:          body.Image,
+		Body:           body.Body,
+		UserID:         uint(userInfo.UserID),
+		Likes:          0,
+		Comments:       0,
+		Shares:         0,
+		ModerationFlag: flag,
 	}
 
 	result := db.Create(thread)

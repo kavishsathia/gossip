@@ -11,6 +11,7 @@ export interface Thread {
   UpdatedAt: string;
   Liked: boolean | null;
   ThreadTags: ThreadTag[];
+  ModerationFlag: string | null;
   Username: string;
   Image: string | null;
   ProfileImage: string | null;

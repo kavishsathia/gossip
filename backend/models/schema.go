@@ -11,18 +11,19 @@ import (
 )
 
 type Thread struct {
-	ID          uint   `gorm:"primaryKey"`
-	Title       string `gorm:"not null"`
-	Description string
-	Body        string `gorm:"not null"`
-	UserID      uint   `gorm:"not null"`
-	Likes       uint   `gorm:"default:0"`
-	Image       string
-	Comments    uint `gorm:"default:0"`
-	Shares      uint `gorm:"default:0"`
-	Deleted     bool `gorm:"default:false"`
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID             uint   `gorm:"primaryKey"`
+	Title          string `gorm:"not null"`
+	Description    string
+	Body           string `gorm:"not null"`
+	UserID         uint   `gorm:"not null"`
+	Likes          uint   `gorm:"default:0"`
+	Image          string
+	Comments       uint    `gorm:"default:0"`
+	Shares         uint    `gorm:"default:0"`
+	Deleted        bool    `gorm:"default:false"`
+	ModerationFlag *string `gorm:"default:NULL"`
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
 
 	ThreadTags []ThreadTag `gorm:"foreignKey:ThreadID"`
 	User       User        `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
@@ -50,6 +51,14 @@ type User struct {
 }
 
 type ThreadLike struct {
+	UserID   uint `gorm:"primaryKey;autoIncrement:false"`
+	ThreadID uint `gorm:"primaryKey;autoIncrement:false"`
+
+	User   User   `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Thread Thread `gorm:"foreignKey:ThreadID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+}
+
+type CommunityFlag struct {
 	UserID   uint `gorm:"primaryKey;autoIncrement:false"`
 	ThreadID uint `gorm:"primaryKey;autoIncrement:false"`
 
@@ -126,6 +135,11 @@ func Migrate() error {
 	}
 
 	err = db.AutoMigrate(&ThreadTag{})
+	if err != nil {
+		return fmt.Errorf("failed to migrate database: %w", err)
+	}
+
+	err = db.AutoMigrate(&CommunityFlag{})
 	if err != nil {
 		return fmt.Errorf("failed to migrate database: %w", err)
 	}

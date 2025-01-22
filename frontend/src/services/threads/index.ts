@@ -52,6 +52,14 @@ export async function likeThread(id: number): Promise<Thread> {
   return json;
 }
 
+export async function reportThread(id: number): Promise<Thread> {
+  const response = await request(`${baseURL}/thread/${id}/report`, {
+    method: "PUT",
+  });
+  const json = await response.json();
+  return json;
+}
+
 export async function unlikeThread(id: number): Promise<Thread> {
   const response = await request(`${baseURL}/thread/${id}/like`, {
     method: "DELETE",

@@ -43,6 +43,7 @@ func GetThread(c *gin.Context) {
         threads.created_at, 
         threads.updated_at, 
         threads.image, 
+		threads.moderation_flag,
         username, 
 		deleted,
         profile_image

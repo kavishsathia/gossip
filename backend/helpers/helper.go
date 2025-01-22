@@ -1,12 +1,15 @@
 package helpers
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
+	"github.com/openai/openai-go"
+	"github.com/openai/openai-go/shared"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -117,4 +120,32 @@ func Generate(userId int, username string) (string, error) {
 	}
 
 	return tokenString, nil
+}
+
+func Moderate(c *gin.Context, text string) (*string, error) {
+	moderationClient := openai.NewClient()
+
+	res, err := moderationClient.Moderations.New(c, openai.ModerationNewParams{
+		Model: openai.F("omni-moderation-latest"),
+		Input: openai.F[openai.ModerationNewParamsInputUnion](shared.UnionString(text)),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if !res.Results[0].Flagged {
+		return nil, nil
+	}
+
+	var flagged map[string]bool
+	json.Unmarshal([]byte(res.Results[0].Categories.JSON.RawJSON()), &flagged)
+
+	for category, isFlagged := range flagged {
+		if isFlagged {
+			return &category, nil
+		}
+	}
+
+	return nil, nil
 }

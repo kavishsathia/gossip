@@ -75,6 +75,7 @@ func main() {
 		protected.DELETE("/thread/:id/like", threads.UnlikeThread)
 		protected.DELETE("/thread/:id", threads.DeleteThread)
 		protected.PUT("/thread/:id", threads.EditThread)
+		protected.PUT("/thread/:id/report", threads.ReportThread)
 
 		protected.GET("/thread/:id/comments", comments.ListThreadComments)
 		protected.POST("/thread/:id/comment", comments.CreateThreadComment)

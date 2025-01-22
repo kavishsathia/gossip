@@ -9,3 +9,4 @@ var DeleteThread = endpoints.DeleteThread
 var EditThread = endpoints.EditThread
 var LikeThread = endpoints.LikeThread
 var UnlikeThread = endpoints.UnlikeThread
+var ReportThread = endpoints.ReportThread
