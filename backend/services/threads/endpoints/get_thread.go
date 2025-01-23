@@ -53,6 +53,7 @@ func GetThread(c *gin.Context) {
         ON users.id = threads.user_id
     `).
 		Preload("ThreadTags").
+		Preload("ThreadCorrections").
 		First(&thread, id)
 
 	if result.Error != nil {

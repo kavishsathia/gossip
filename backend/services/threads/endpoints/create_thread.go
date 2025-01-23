@@ -37,9 +37,22 @@ func CreateThread(c *gin.Context) {
 		return
 	}
 
+	description, err := helpers.GenerateDescription(c, body.Body)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate description"})
+		return
+	}
+
+	corrections, err := helpers.GenerateCorrections(c, body.Body)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fact check thread."})
+	}
+
 	thread := &models.Thread{
 		Title:          body.Title,
-		Description:    "",
+		Description:    description,
 		Image:          body.Image,
 		Body:           body.Body,
 		UserID:         uint(userInfo.UserID),
@@ -69,6 +82,13 @@ func CreateThread(c *gin.Context) {
 		db.Create(&models.ThreadTag{
 			ThreadID: thread.ID,
 			Tag:      value,
+		})
+	}
+
+	for _, value := range corrections {
+		db.Create(&models.ThreadCorrection{
+			ThreadID:   thread.ID,
+			Correction: value,
 		})
 	}
 

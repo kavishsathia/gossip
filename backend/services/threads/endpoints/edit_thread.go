@@ -35,14 +35,22 @@ func EditThread(c *gin.Context) {
 		return
 	}
 
+	description, err := helpers.GenerateDescription(c, body.Body)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate description"})
+		return
+	}
+
 	var thread models.Thread
 	result := db.Model(&thread).
 		Where("id = ?", id).
 		Where("user_id = ?", userInfo.UserID).
 		Updates(map[string]interface{}{
-			"title": body.Title,
-			"body":  body.Body,
-			"image": body.Image,
+			"title":       body.Title,
+			"body":        body.Body,
+			"image":       body.Image,
+			"description": description,
 		})
 
 	if result.Error != nil {

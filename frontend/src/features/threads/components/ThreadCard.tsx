@@ -36,7 +36,9 @@ export default function ThreadCard({ item }: { item: Thread }) {
       to={`/thread/${item.ID}?${searchParams.toString()}`}
     >
       <Card
-        className={`w-full border ${id === item.ID ? "border-teal-600 border-[1.5px]" : "border-gray-150"} hover:shadow-lg transition-shadow duration-200`}
+        className={`w-full border ${
+          id === item.ID ? "border-teal-600 border-[1.5px]" : "border-gray-150"
+        } hover:shadow-lg transition-shadow duration-200`}
         elevation={0}
       >
         <div className="flex gap-2">
@@ -57,7 +59,7 @@ export default function ThreadCard({ item }: { item: Thread }) {
               </h3>
 
               <h5 className="text-sm text-gray-800 line-clamp-2 text-left">
-                {item.Body}
+                {item.Description}
               </h5>
             </CardContent>
 

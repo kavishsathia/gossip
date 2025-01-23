@@ -12,6 +12,7 @@ export interface Thread {
   Liked: boolean | null;
   ThreadTags: ThreadTag[];
   ModerationFlag: string | null;
+  ThreadCorrections: ThreadCorrection[];
   Username: string;
   Image: string | null;
   ProfileImage: string | null;
@@ -21,4 +22,9 @@ export interface Thread {
 export interface ThreadTag {
   ThreadID: number;
   Tag: string;
+}
+
+export interface ThreadCorrection {
+  ThreadID: number;
+  Correction: string;
 }

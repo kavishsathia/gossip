@@ -25,13 +25,21 @@ type Thread struct {
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 
-	ThreadTags []ThreadTag `gorm:"foreignKey:ThreadID"`
-	User       User        `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	ThreadTags        []ThreadTag        `gorm:"foreignKey:ThreadID"`
+	ThreadCorrections []ThreadCorrection `gorm:"foreignKey:ThreadID"`
+	User              User               `gorm:"foreignKey:UserID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
 
 type ThreadTag struct {
 	ThreadID uint   `gorm:"primaryKey;autoIncrement:false"`
 	Tag      string `gorm:"primaryKey;autoIncrement:false"`
+
+	Thread Thread `gorm:"foreignKey:ThreadID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+}
+
+type ThreadCorrection struct {
+	ThreadID   uint   `gorm:"primaryKey;autoIncrement:false"`
+	Correction string `gorm:"primaryKey;autoIncrement:false"`
 
 	Thread Thread `gorm:"foreignKey:ThreadID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
@@ -140,6 +148,11 @@ func Migrate() error {
 	}
 
 	err = db.AutoMigrate(&CommunityFlag{})
+	if err != nil {
+		return fmt.Errorf("failed to migrate database: %w", err)
+	}
+
+	err = db.AutoMigrate(&ThreadCorrection{})
 	if err != nil {
 		return fmt.Errorf("failed to migrate database: %w", err)
 	}
