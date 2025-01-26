@@ -13,6 +13,13 @@
 
 </div>
 
+## For Quick Access:
+- <a href="https://uniconnweb.netlify.app/">The Website</a>
+- <a href="https://gossip.s6wyfaw6z9q0r.ap-southeast-1.cs.amazonlightsail.com/swagger/index.html">Swagger API Documentation</a>
+- [Developer Manual](#developer-manual)
+- [User Manual](#user-manual)
+
+
 <br>
 
 ## Table of Contents
@@ -24,8 +31,9 @@
 - [User Interface](#user-interface)
 - [Data Model](#data-model)
 - [Architecture](#architecture)
+- [API Documentation](#api-documentation)
 - [Developer Manual](#developer-manual)
-- [Developer Manual](#user-manual)
+- [User Manual](#user-manual)
 - [Accomplishments](#accomplishments)
 
 <br>
@@ -35,12 +43,12 @@
 These are the features that I have included in Uniconn. To try out these features, go to: [Uniconn Web](https://uniconnweb.netlify.app) (You can click on "Lurk" to skip the authentication process):
 
 - Account-based authentication with JWT stored in an HTTP Cookie.
-- Write threads using markdown and include a thumbnail picture for more engagement.
+- Write threads using markdown and include a thumbnail picture for more engagement. Threads are editable and deletable.
 - Real-time notifications when the user's thread or comment is liked or commented on.
 - Nested comments.
 - Mobile responsiveness.
 - Progressive web app (allowing users to install the web app onto their devices).
-- Searching for forums based on title, description, tags, and author username.
+- Searching for forums based on title, description, tags, and author username. The response is paginated (click on "Load more" at the bottom of the sidebar to load more threads).
 - A point system (Aura) that will increase when a user's thread or comment gets liked, incentivizing participation.
 - Content moderation using AI and community feedback.
 - AI-generated descriptions for threads.
@@ -162,27 +170,29 @@ go mod download
 go run .
 ```
 
-6. Start a new terminal session.
+8. Explore the <a href="https://gossip.s6wyfaw6z9q0r.ap-southeast-1.cs.amazonlightsail.com/swagger/index.html">API documentation</a>. to learn more.
+  
+9. Start a new terminal session.
 
-7. Change your directory to the frontend. Run:
+10. Change your directory to the frontend. Run:
 
 ```console
 cd gossip/frontend
 ```
 
-8. Download the required modules. Run:
+11. Download the required modules. Run:
 
 ```console
 npm install
 ```
 
-9. Start the server. Run:
+12. Start the server. Run:
 
 ```console
 npm run dev
 ```
 
-10. The server will start at localhost:5173.
+13. The server will start at localhost:5173.
 
 <br>
 
@@ -191,7 +201,7 @@ npm run dev
 1. How to create a new account? Click on sign up on the login page.
 2. Can I view posts without signing up? Yes, you can! Just click on ”Lurk” on the login page, however
    if you try to like or comment, you will be redirected to the login page.
-3. How to search for posts? Use the search bar on the left sidebar.
+3. How to search for posts? Use the search bar on the left sidebar. The response is paginated, so click on "Load more" at the bottom of the sidebar to load more threads.
 4. How to search by tags and author username? Add ”#” in front of tags and ”@” in front of
    usernames when searching in the search bar. For example, to find all posts written by me with the
    ”nus” tag and contains the word ”CS”, you can search ”@kavish #nus cs”.
