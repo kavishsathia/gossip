@@ -19,15 +19,31 @@ func EditThread(c *gin.Context, body thread_types.ThreadCreationForm, db *gorm.D
 		return
 	}
 
+	// Moderate the thread
+	moderationFlag, err := helpers.Moderate(c, body.Body)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to moderate"})
+		return
+	}
+
+	// Fact check
+	corrections, err := helpers.GenerateCorrections(c, body.Body)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fact check thread."})
+	}
+
 	var thread models.Thread
 	editThreadResult := db.Model(&thread).
 		Where("id = ?", id).
 		Where("user_id = ?", userInfo.UserID).
 		Updates(map[string]interface{}{
-			"title":       body.Title,
-			"body":        body.Body,
-			"image":       body.Image,
-			"description": description,
+			"title":           body.Title,
+			"body":            body.Body,
+			"image":           body.Image,
+			"moderation_flag": moderationFlag,
+			"description":     description,
 		})
 
 	if editThreadResult.Error != nil {
@@ -48,10 +64,24 @@ func EditThread(c *gin.Context, body thread_types.ThreadCreationForm, db *gorm.D
 		return
 	}
 
+	deleteCorrectionsResult := db.Where("thread_id = ?", id).Delete(&models.ThreadCorrection{})
+
+	if deleteCorrectionsResult.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to edit thread"})
+		return
+	}
+
 	for _, value := range body.Tags {
 		db.Create(&models.ThreadTag{
 			ThreadID: uint(id),
 			Tag:      value,
+		})
+	}
+
+	for _, value := range corrections {
+		db.Create(&models.ThreadCorrection{
+			ThreadID:   uint(id),
+			Correction: value,
 		})
 	}
 

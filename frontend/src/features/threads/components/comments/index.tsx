@@ -11,7 +11,15 @@ import { ThreadComment } from "../../../../services/comments/types";
 import Comment from "./Comment";
 import { TextField } from "@mui/material";
 
-function App({ id, isFromPost }: { id: number | null; isFromPost: boolean }) {
+function App({
+  id,
+  isFromPost,
+  depth,
+}: {
+  id: number | null;
+  isFromPost: boolean;
+  depth: number;
+}) {
   const [comments, setComments] = useState<ThreadComment[]>();
   const [comment, setComment] = useState<string>("");
 
@@ -58,7 +66,12 @@ function App({ id, isFromPost }: { id: number | null; isFromPost: boolean }) {
       </div>
       <div className="mt-6">
         {comments?.map((comment, index) => (
-          <Comment key={index} comment={comment} index={index}></Comment>
+          <Comment
+            key={index}
+            comment={comment}
+            index={index}
+            depth={depth + 1}
+          ></Comment>
         ))}
       </div>
     </div>

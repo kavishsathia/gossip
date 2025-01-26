@@ -86,7 +86,7 @@ function App() {
       <InteractionBar thread={thread} setThread={setThread} />
 
       <div className="w-full pt-8 pb-12 lg:px-8">
-        <Comments isFromPost={true} id={id} />
+        <Comments isFromPost={true} id={id} depth={0} />
       </div>
 
       <BRSpeedDial />

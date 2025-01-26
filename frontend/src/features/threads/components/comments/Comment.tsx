@@ -7,7 +7,15 @@ import AuthorInfo from "./AuthorInfo";
 import EditorToolbox from "../comments/EditorToolbox";
 import InteractionBar from "./InteractionBar";
 
-function App({ comment, index }: { comment: ThreadComment; index: number }) {
+function App({
+  comment,
+  index,
+  depth,
+}: {
+  comment: ThreadComment;
+  index: number;
+  depth: number;
+}) {
   const [repliesOpen, setRepliesOpen] = useState<boolean>(false);
   const [commentBuffer, setCommentBuffer] = useState<string>(comment.Comment);
   const [editing, setEditing] = useState<boolean>(false);
@@ -50,17 +58,21 @@ function App({ comment, index }: { comment: ThreadComment; index: number }) {
       )}
 
       <div className="flex items-center justify-between mt-2">
-        <span
-          onClick={() => setRepliesOpen(!repliesOpen)}
-          className="text-sm hover:underline cursor-pointer"
-        >
-          {repliesOpen ? "Hide" : "Show"} replies
-        </span>
+        {depth < 5 ? (
+          <span
+            onClick={() => setRepliesOpen(!repliesOpen)}
+            className="text-sm hover:underline cursor-pointer"
+          >
+            {repliesOpen ? "Hide" : "Show"} replies
+          </span>
+        ) : (
+          <div />
+        )}
 
         <InteractionBar comment={comment} />
       </div>
 
-      {repliesOpen ? (
+      {repliesOpen && depth < 5 ? (
         <div className="grid grid-cols-12 mt-5">
           <div className="flex justify-center mb-5">
             <div
@@ -69,7 +81,11 @@ function App({ comment, index }: { comment: ThreadComment; index: number }) {
             ></div>
           </div>
           <div className="col-span-11">
-            <Comments id={comment.ID} isFromPost={false}></Comments>
+            <Comments
+              id={comment.ID}
+              isFromPost={false}
+              depth={depth}
+            ></Comments>
           </div>
         </div>
       ) : (

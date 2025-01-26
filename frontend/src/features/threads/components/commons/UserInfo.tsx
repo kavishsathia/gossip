@@ -5,7 +5,17 @@ import { Profile } from "../../../../services/auth/types";
 import { useSearchParams } from "react-router";
 import { dateTranslate } from "./DatetimeHelper";
 
-function App({ username, userId }: { username: string; userId: number }) {
+function App({
+  username,
+  userId,
+  picture,
+  width,
+}: {
+  username: string;
+  userId: number;
+  picture: boolean;
+  width: string;
+}) {
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState<Profile>();
   const handleOpen = () => setOpen(true);
@@ -13,22 +23,31 @@ function App({ username, userId }: { username: string; userId: number }) {
   const [, setSearchParams] = useSearchParams();
 
   useEffect(() => {
-    const fetchThreads = async () => {
+    const fetchUser = async () => {
       const data = await getUser(userId);
       setUser(data);
     };
 
-    fetchThreads();
+    fetchUser();
   }, [username, userId]);
 
   return (
     <div>
-      <p
-        onClick={handleOpen}
-        className="cursor-pointer hover:underline text-sm h-fit font-semibold"
-      >
-        {username}
-      </p>
+      {picture ? (
+        <Avatar
+          onClick={handleOpen}
+          src={user?.ProfileImage}
+          sx={{ width: width, height: width }}
+        ></Avatar>
+      ) : (
+        <p
+          onClick={handleOpen}
+          className="cursor-pointer hover:underline text-sm h-fit font-semibold"
+        >
+          {username}
+        </p>
+      )}
+
       <Modal
         open={open}
         onClose={handleClose}

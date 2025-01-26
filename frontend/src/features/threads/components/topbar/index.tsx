@@ -1,8 +1,8 @@
 import { LogOut } from "lucide-react";
 import { signOut } from "../../../../services/auth";
 import { Link } from "react-router";
-import { Avatar } from "@mui/material";
 import { Profile } from "../../../../services/auth/types";
+import UserInfo from "../commons/UserInfo";
 
 function TopBar({ me }: { me: Profile }) {
   return (
@@ -21,10 +21,12 @@ function TopBar({ me }: { me: Profile }) {
       <Link to="/">
         <img className="h-6 w-auto" src="/logo.png" alt="Logo" />
       </Link>
-      <Avatar
-        src={me?.ProfileImage}
-        sx={{ width: "35px", height: "35px" }}
-      ></Avatar>
+      <UserInfo
+        width="35px"
+        picture={true}
+        userId={me.ID ?? 0}
+        username={me.Username ?? ""}
+      />
     </div>
   );
 }
