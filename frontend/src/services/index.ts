@@ -4,7 +4,13 @@ export const websocketBaseURL = import.meta.env.VITE_WEBSOCKET_BASE_URL;
 export const request = async (input: RequestInfo | URL, init?: RequestInit) => {
   const response = await fetch(input, { ...init, credentials: "include" });
   if (response.status === 401) {
-    window.location.href = "/login";
+    if (
+      confirm(`
+      You are lurking, too make changes please log in. 
+      Do you want to be redirected to the login page?
+    `)
+    )
+      window.location.href = "/login";
   }
 
   if (response.status > 499) {
