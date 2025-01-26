@@ -4,14 +4,18 @@ export const websocketBaseURL = import.meta.env.VITE_WEBSOCKET_BASE_URL;
 export const request = async (input: RequestInfo | URL, init?: RequestInit) => {
   const response = await fetch(input, { ...init, credentials: "include" });
   if (response.status === 401) {
+    const res = await response.json();
     if (
-      (await response.json()).error === "Unauthorized: Lurking" &&
+      res.error === "Unauthorized: Lurking" &&
       confirm(`
-      You are lurking, too make changes please log in. 
+      You are lurking, to make changes please log in. 
       Do you want to be redirected to the login page?
     `)
-    )
+    ) {
       window.location.href = "/login";
+    } else if (res.error !== "Unauthorized: Lurking") {
+      window.location.href = "/login";
+    }
   }
 
   if (response.status > 499) {
