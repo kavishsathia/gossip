@@ -30,6 +30,7 @@ func GetNotifications(c *gin.Context) {
 		return
 	}
 
+	// Get the Redis connection
 	rdb, err := helpers.OpenRedis()
 
 	if err != nil {
@@ -39,17 +40,24 @@ func GetNotifications(c *gin.Context) {
 
 	defer rdb.Close()
 
+	// Get the PubSub connection
 	pubsub := rdb.Subscribe(c, strconv.Itoa(userInfo.UserID))
 
 	defer pubsub.Close()
 
 	ch := pubsub.Channel()
 
+	// When there is a message from the pubsub connection, we send it to the
+	// user
 	for msg := range ch {
 		conn.WriteMessage(websocket.TextMessage, []byte(msg.Payload))
 	}
 }
 
+// The following function was made as an additional feature, but
+// after implementation, I felt like it wasn't really necessary
+// and only introduced new bugs, so I have kept it here for the time
+// being but it is not actively being used.
 func GetThreadInfo(c *gin.Context) {
 	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)

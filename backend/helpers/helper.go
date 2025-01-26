@@ -59,7 +59,7 @@ func GetUserInfo(c *gin.Context) (interface{}, *User, error) {
 	return user, userInfo, nil
 }
 
-func Verify(tokenString string) (*User, error) {
+func VerifyJWT(tokenString string) (*User, error) {
 	secretKey := os.Getenv("JWT_SECRET")
 	if secretKey == "" {
 		return nil, errors.New("JWT secret key not found in environment")
@@ -101,7 +101,7 @@ func Verify(tokenString string) (*User, error) {
 	}, nil
 }
 
-func Generate(userId int, username string) (string, error) {
+func GenerateJWT(userId int, username string) (string, error) {
 	secret := []byte(os.Getenv("JWT_SECRET"))
 	if len(secret) == 0 {
 		return "", errors.New("JWT private key not found in environment")

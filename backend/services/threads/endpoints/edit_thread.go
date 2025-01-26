@@ -10,6 +10,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// EditThread godoc
+// @Summary Edits a thread
+// @Description Edits a thread
+// @Tags threads
+// @Accept json
+// @Produce json
+// @Param thread body thread_types.ThreadCreationForm true "Thread payload"
+// @Param id path int true "ID"
+// @Success 200 {object} map[string]boolean "Thread successfully edited"
+// @Failure 400 {object} map[string]string "Invalid request"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /thread/:id [put]
 func EditThread(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -35,6 +47,7 @@ func EditThread(c *gin.Context) {
 		return
 	}
 
+	// Generate the description
 	description, err := helpers.GenerateDescription(c, body.Body)
 
 	if err != nil {
@@ -43,7 +56,7 @@ func EditThread(c *gin.Context) {
 	}
 
 	var thread models.Thread
-	result := db.Model(&thread).
+	editThreadResult := db.Model(&thread).
 		Where("id = ?", id).
 		Where("user_id = ?", userInfo.UserID).
 		Updates(map[string]interface{}{
@@ -53,19 +66,20 @@ func EditThread(c *gin.Context) {
 			"description": description,
 		})
 
-	if result.Error != nil {
+	if editThreadResult.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to edit thread"})
 		return
 	}
 
-	if result.RowsAffected == 0 {
+	if editThreadResult.RowsAffected == 0 {
 		c.JSON(http.StatusForbidden, gin.H{"error": "Failed to edit thread"})
 		return
 	}
 
-	result2 := db.Where("thread_id = ?", id).Delete(&models.ThreadTag{})
+	// Reset the tags and add them back
+	deleteTagsResult := db.Where("thread_id = ?", id).Delete(&models.ThreadTag{})
 
-	if result2.Error != nil {
+	if deleteTagsResult.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to edit thread"})
 		return
 	}

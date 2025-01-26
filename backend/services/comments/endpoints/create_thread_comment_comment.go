@@ -12,6 +12,18 @@ import (
 	"gorm.io/gorm"
 )
 
+// CreateThreadCommentComment godoc
+// @Summary Creates a nested comment
+// @Description Creates a nested comment
+// @Tags comments
+// @Accept json
+// @Produce json
+// @Param comment body comment_types.CommentCreationForm true "Comment payload"
+// @Param id path int true "commentID"
+// @Success 200 {object} map[string]boolean "Comment successfully created"
+// @Failure 400 {object} map[string]string "Invalid request"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /comment/:id/comment [post]
 func CreateThreadCommentComment(c *gin.Context) {
 	var body comment_types.CommentCreationForm
 
@@ -39,10 +51,9 @@ func CreateThreadCommentComment(c *gin.Context) {
 
 	var comment models.ThreadComment
 	db.Where("id = ?", id).First(&comment)
-	println(comment.ThreadID)
 
 	parentId := uint(id)
-	result := db.Create(&models.ThreadComment{
+	creationResult := db.Create(&models.ThreadComment{
 		ThreadID: comment.ThreadID,
 		Comment:  body.Body,
 		UserID:   uint(userInfo.UserID),
@@ -51,40 +62,43 @@ func CreateThreadCommentComment(c *gin.Context) {
 		ParentID: &parentId,
 	})
 
-	if result.Error != nil {
+	if creationResult.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create comment"})
 		return
 	}
 
-	result2 := db.Model(&models.Thread{}).
+	// Updating the comment count on thread
+	threadCountUpdateResult := db.Model(&models.Thread{}).
 		Where("id = ?", comment.ThreadID).
 		Update("comments", gorm.Expr("comments + ?", 1))
 
-	if result2.Error != nil {
+	if threadCountUpdateResult.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create comment"})
 		return
 	}
 
-	result3 := db.Model(&models.ThreadComment{}).
+	// Updating the comment count on the parent comment
+	commentCountUpdateResult := db.Model(&models.ThreadComment{}).
 		Where("id = ?", uint(id)).
 		Update("comments", gorm.Expr("comments + ?", 1))
 
-	if result3.Error != nil {
+	if commentCountUpdateResult.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create comment"})
 		return
 	}
 
-	result4 := db.Model(&models.User{}).
+	// Updating the comment count on the user
+	userCountUpdateResult := db.Model(&models.User{}).
 		Where("id = ?", uint(userInfo.UserID)).
 		Update("comments", gorm.Expr("comments + ?", 1))
 
-	if result4.Error != nil {
+	if userCountUpdateResult.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create comment"})
 		return
 	}
 
 	var parent models.ThreadComment
-	result5 := db.Table("thread_comments").
+	getParentInfoResult := db.Table("thread_comments").
 		Select(`
         thread_comments.id,
 		thread_comments.user_id, 
@@ -98,11 +112,12 @@ func CreateThreadCommentComment(c *gin.Context) {
 		thread_comments.updated_at
     `)
 
-	if result5.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch threads"})
+	if getParentInfoResult.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Parent comment not found"})
 		return
 	}
 
+	// Sending notifications to the user
 	notifications.SendNotification(c, int(parent.UserID), userInfo.Username+" replied to your comment", userInfo.UserID)
 	notifications.SendThreadInfo(c, int(comment.ThreadID), "comment", 1)
 }

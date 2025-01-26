@@ -9,6 +9,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// ListThreadCommentComments godoc
+// @Summary Lists nested comment
+// @Description Lists nested comment
+// @Tags comments
+// @Accept json
+// @Produce json
+// @Param id path int true "commentID"
+// @Success 200 {object} map[string]boolean "Comments succesfully retrieved"
+// @Failure 400 {object} map[string]string "Invalid request"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /comment/:id/comments [get]
 func ListThreadCommentComments(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

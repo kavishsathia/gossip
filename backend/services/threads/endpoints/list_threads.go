@@ -10,6 +10,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// ListThread godoc
+// @Summary Lists threads
+// @Description Lists threads
+// @Tags threads
+// @Accept json
+// @Produce json
+// @Param query query string true "Search string"
+// @Success 200 {object} []thread_types.ThreadResponse "Threads successfully retrieved"
+// @Failure 400 {object} map[string]string "Invalid request"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /threads [get]
 func ListThreads(c *gin.Context) {
 	var queries = strings.Split(c.Query("query"), " ")
 	var search = ""

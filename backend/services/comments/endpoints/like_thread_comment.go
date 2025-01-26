@@ -11,6 +11,17 @@ import (
 	"gorm.io/gorm"
 )
 
+// LikeThreadComment godoc
+// @Summary Likes a comment
+// @Description Likes a  comment
+// @Tags comments
+// @Accept json
+// @Produce json
+// @Param id path int true "commentID"
+// @Success 200 {object} map[string]boolean "Comment successfully liked"
+// @Failure 400 {object} map[string]string "Invalid request"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /comment/:id/like [post]
 func LikeThreadComment(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -30,27 +41,28 @@ func LikeThreadComment(c *gin.Context) {
 		return
 	}
 
-	result := db.Create(&models.ThreadCommentLike{
+	createThreadCommentLikeResult := db.Create(&models.ThreadCommentLike{
 		CommentID: uint(id),
 		UserID:    uint(userInfo.UserID),
 	})
 
-	if result.Error != nil {
+	if createThreadCommentLikeResult.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to like comment"})
 		return
 	}
 
-	result2 := db.Model(&models.ThreadComment{}).
+	// Updating the like count on the comment
+	commentCountUpdateResult := db.Model(&models.ThreadComment{}).
 		Where("id = ?", id).
 		Update("likes", gorm.Expr("likes + ?", 1))
 
-	if result2.Error != nil {
+	if commentCountUpdateResult.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to like comment"})
 		return
 	}
 
 	var comment models.ThreadComment
-	result3 := db.Table("thread_comments").
+	getThreadCommentInfoResult := db.Table("thread_comments").
 		Select(`
         thread_comments.id,
 		thread_comments.user_id, 
@@ -64,12 +76,12 @@ func LikeThreadComment(c *gin.Context) {
 		thread_comments.updated_at
     `)
 
-	if result3.Error != nil {
+	if getThreadCommentInfoResult.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to like comment"})
 		return
 	}
 
+	// Sending notification to the user
 	notifications.SendNotification(c, int(comment.UserID), userInfo.Username+" liked your comment", userInfo.UserID)
-
 	c.JSON(http.StatusOK, gin.H{"success": true})
 }

@@ -1,0 +1,864 @@
+definitions:
+  auth.UserCreationForm:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  comment_types.CommentCreationForm:
+    properties:
+      body:
+        type: string
+    type: object
+  models.Thread:
+    properties:
+      body:
+        type: string
+      comments:
+        type: integer
+      createdAt:
+        type: string
+      deleted:
+        type: boolean
+      description:
+        type: string
+      id:
+        type: integer
+      image:
+        type: string
+      likes:
+        type: integer
+      moderationFlag:
+        type: string
+      shares:
+        type: integer
+      threadCorrections:
+        items:
+          $ref: '#/definitions/models.ThreadCorrection'
+        type: array
+      threadTags:
+        items:
+          $ref: '#/definitions/models.ThreadTag'
+        type: array
+      title:
+        type: string
+      updatedAt:
+        type: string
+      user:
+        $ref: '#/definitions/models.User'
+      userID:
+        type: integer
+    type: object
+  models.ThreadCorrection:
+    properties:
+      correction:
+        type: string
+      thread:
+        $ref: '#/definitions/models.Thread'
+      threadID:
+        type: integer
+    type: object
+  models.ThreadTag:
+    properties:
+      tag:
+        type: string
+      thread:
+        $ref: '#/definitions/models.Thread'
+      threadID:
+        type: integer
+    type: object
+  models.User:
+    properties:
+      aura:
+        type: integer
+      comments:
+        type: integer
+      createdAt:
+        type: string
+      id:
+        type: integer
+      passwordHash:
+        type: string
+      posts:
+        type: integer
+      profileImage:
+        type: string
+      threads:
+        items:
+          $ref: '#/definitions/models.Thread'
+        type: array
+      updatedAt:
+        type: string
+      username:
+        type: string
+    type: object
+  thread_types.ThreadCreationForm:
+    properties:
+      body:
+        type: string
+      image:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+    type: object
+  thread_types.ThreadResponse:
+    properties:
+      body:
+        type: string
+      comments:
+        type: integer
+      createdAt:
+        type: string
+      deleted:
+        type: boolean
+      description:
+        type: string
+      id:
+        type: integer
+      image:
+        type: string
+      liked:
+        type: boolean
+      likes:
+        type: integer
+      moderationFlag:
+        type: string
+      profileImage:
+        type: string
+      shares:
+        type: integer
+      threadCorrections:
+        items:
+          $ref: '#/definitions/models.ThreadCorrection'
+        type: array
+      threadTags:
+        items:
+          $ref: '#/definitions/models.ThreadTag'
+        type: array
+      title:
+        type: string
+      updatedAt:
+        type: string
+      user:
+        $ref: '#/definitions/models.User'
+      userID:
+        type: integer
+      username:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /comment/:id:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a  comment
+      parameters:
+      - description: commentID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Comment successfully deleted
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Deletes a comment
+      tags:
+      - comments
+    put:
+      consumes:
+      - application/json
+      description: Edits a  comment
+      parameters:
+      - description: Comment payload
+        in: body
+        name: comment
+        required: true
+        schema:
+          $ref: '#/definitions/comment_types.CommentCreationForm'
+      - description: commentID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Comment successfully edited
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Edits a comment
+      tags:
+      - comments
+  /comment/:id/comment:
+    post:
+      consumes:
+      - application/json
+      description: Creates a nested comment
+      parameters:
+      - description: Comment payload
+        in: body
+        name: comment
+        required: true
+        schema:
+          $ref: '#/definitions/comment_types.CommentCreationForm'
+      - description: commentID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Comment successfully created
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Creates a nested comment
+      tags:
+      - comments
+  /comment/:id/comments:
+    get:
+      consumes:
+      - application/json
+      description: Lists nested comment
+      parameters:
+      - description: commentID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Comments succesfully retrieved
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Lists nested comment
+      tags:
+      - comments
+  /comment/:id/like:
+    delete:
+      consumes:
+      - application/json
+      description: Unlikes a  comment
+      parameters:
+      - description: commentID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Comment successfully liked
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Unlikes a comment
+      tags:
+      - comments
+    post:
+      consumes:
+      - application/json
+      description: Likes a  comment
+      parameters:
+      - description: commentID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Comment successfully liked
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Likes a comment
+      tags:
+      - comments
+  /thread:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new discussion thread
+      parameters:
+      - description: Thread creation payload
+        in: body
+        name: thread
+        required: true
+        schema:
+          $ref: '#/definitions/thread_types.ThreadCreationForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Thread successfully created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new thread
+      tags:
+      - threads
+  /thread/:id:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a thread
+      parameters:
+      - description: threadID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Thread successfully deleted
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Deletes a thread
+      tags:
+      - threads
+    get:
+      consumes:
+      - application/json
+      description: Get a thread
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Thread successfully retrieved
+          schema:
+            $ref: '#/definitions/thread_types.ThreadResponse'
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a thread
+      tags:
+      - threads
+    put:
+      consumes:
+      - application/json
+      description: Edits a thread
+      parameters:
+      - description: Thread payload
+        in: body
+        name: thread
+        required: true
+        schema:
+          $ref: '#/definitions/thread_types.ThreadCreationForm'
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Thread successfully edited
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Edits a thread
+      tags:
+      - threads
+  /thread/:id/comment:
+    post:
+      consumes:
+      - application/json
+      description: Creates a direct comment
+      parameters:
+      - description: Comment payload
+        in: body
+        name: comment
+        required: true
+        schema:
+          $ref: '#/definitions/comment_types.CommentCreationForm'
+      - description: threadID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Comment successfully created
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Creates a direct comment
+      tags:
+      - comments
+  /thread/:id/comments:
+    get:
+      consumes:
+      - application/json
+      description: Lists direct comments
+      parameters:
+      - description: threadID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Comments succesfully retrieved
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Lists direct comments
+      tags:
+      - comments
+  /thread/:id/like:
+    delete:
+      consumes:
+      - application/json
+      description: Unlikes a thread
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Thread successfully unliked
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Unlikes a thread
+      tags:
+      - threads
+    post:
+      consumes:
+      - application/json
+      description: Likes a thread
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Thread successfully liked
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Likes a thread
+      tags:
+      - threads
+  /thread/:id/report:
+    put:
+      consumes:
+      - application/json
+      description: Reports a thread
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Thread successfully reported
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Reports a thread
+      tags:
+      - threads
+  /threads:
+    get:
+      consumes:
+      - application/json
+      description: Lists threads
+      parameters:
+      - description: Search string
+        in: query
+        name: query
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Threads successfully retrieved
+          schema:
+            items:
+              $ref: '#/definitions/thread_types.ThreadResponse'
+            type: array
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Lists threads
+      tags:
+      - threads
+  /user:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user account
+      parameters:
+      - description: User creation payload
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/auth.UserCreationForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User created successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request payload
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Username already exists
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Register a new user
+      tags:
+      - auth
+  /user/:id:
+    get:
+      consumes:
+      - application/json
+      description: Get my profile
+      parameters:
+      - description: userID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Profile successfully retrieved
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get my profile
+      tags:
+      - auth
+  /user/me:
+    get:
+      consumes:
+      - application/json
+      description: Get my profile
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Profile successfully retrieved
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get my profile
+      tags:
+      - auth
+  /user/sign-in:
+    put:
+      consumes:
+      - application/json
+      description: Login as a user
+      parameters:
+      - description: User creation payload
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/auth.UserCreationForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Login successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request payload
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Login as a user
+      tags:
+      - auth
+  /user/sign-out:
+    get:
+      consumes:
+      - application/json
+      description: Sign out
+      produces:
+      - application/json
+      responses:
+        "401":
+          description: Sign out successfully
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Sign out
+      tags:
+      - auth
+swagger: "2.0"

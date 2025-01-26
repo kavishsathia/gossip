@@ -11,6 +11,17 @@ import (
 	"gorm.io/gorm"
 )
 
+// LikeThread godoc
+// @Summary Likes a thread
+// @Description Likes a thread
+// @Tags threads
+// @Accept json
+// @Produce json
+// @Param id path int true "ID"
+// @Success 200 {object} map[string]boolean "Thread successfully liked"
+// @Failure 400 {object} map[string]string "Invalid request"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /thread/:id/like [post]
 func LikeThread(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -30,29 +41,29 @@ func LikeThread(c *gin.Context) {
 		return
 	}
 
-	result := db.Create(&models.ThreadLike{
+	likeThreadResult := db.Create(&models.ThreadLike{
 		ThreadID: uint(id),
 		UserID:   uint(userInfo.UserID),
 	})
 
-	if result.Error != nil {
+	if likeThreadResult.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to like thread"})
 		return
 	}
 
-	result2 := db.Model(&models.Thread{}).
+	threadCountUpdateResult := db.Model(&models.Thread{}).
 		Where("id = ?", id).
 		Update("likes", gorm.Expr("likes + ?", 1))
 
-	if result2.Error != nil {
+	if threadCountUpdateResult.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to like thread"})
 		return
 	}
 
 	var thread models.Thread
-	result3 := db.First(&thread, id)
+	getThreadInfoResult := db.First(&thread, id)
 
-	if result3.Error != nil {
+	if getThreadInfoResult.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to like thread"})
 	}
 

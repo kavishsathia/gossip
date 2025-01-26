@@ -9,6 +9,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// DeleteThreadComment godoc
+// @Summary Deletes a comment
+// @Description Deletes a  comment
+// @Tags comments
+// @Accept json
+// @Produce json
+// @Param id path int true "commentID"
+// @Success 200 {object} map[string]boolean "Comment successfully deleted"
+// @Failure 400 {object} map[string]string "Invalid request"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /comment/:id [delete]
 func DeleteThreadComment(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -40,7 +51,7 @@ func DeleteThreadComment(c *gin.Context) {
 	}
 
 	if result.RowsAffected == 0 {
-		c.JSON(http.StatusForbidden, gin.H{"error": "Failed to delete comment"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Comment not found"})
 		return
 	}
 

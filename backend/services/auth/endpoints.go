@@ -3,13 +3,27 @@ package auth
 import (
 	"backend/helpers"
 	"backend/models"
+	"errors"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
+// CreateUser godoc
+// @Summary Register a new user
+// @Description Creates a new user account
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param user body UserCreationForm true "User creation payload"
+// @Success 200 {object} map[string]interface{} "User created successfully"
+// @Failure 400 {object} map[string]string "Invalid request payload"
+// @Failure 409 {object} map[string]string "Username already exists"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /user [post]
 func CreateUser(c *gin.Context) {
 	var body UserCreationForm
 
@@ -45,6 +59,17 @@ func CreateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"UserID": user.ID})
 }
 
+// LoginAsUser godoc
+// @Summary Login as a user
+// @Description Login as a user
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param user body UserCreationForm true "User creation payload"
+// @Success 200 {object} map[string]interface{} "Login successfully"
+// @Failure 400 {object} map[string]string "Invalid request payload"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /user/sign-in [put]
 func LoginAsUser(c *gin.Context) {
 	var body UserCreationForm
 
@@ -74,13 +99,14 @@ func LoginAsUser(c *gin.Context) {
 		return
 	}
 
-	token, err := helpers.Generate(int(user.ID), user.Username)
+	token, err := helpers.GenerateJWT(int(user.ID), user.Username)
 	if err != nil {
 		println(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal Server Error."})
 		return
 	}
 
+	// Setting the auth token as a cookie on the browser
 	http.SetCookie(c.Writer, &http.Cookie{
 		Name:     "authToken",
 		Value:    token,
@@ -96,8 +122,17 @@ func LoginAsUser(c *gin.Context) {
 	})
 }
 
+// SignOut godoc
+// @Summary Sign out
+// @Description Sign out
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Success 401 {object} map[string]interface{} "Sign out successfully"
+// @Router /user/sign-out [get]
 func SignOut(c *gin.Context) {
 
+	// Resetting the cookie as en empty string on the browser
 	http.SetCookie(c.Writer, &http.Cookie{
 		Name:     "authToken",
 		Value:    "",
@@ -113,6 +148,14 @@ func SignOut(c *gin.Context) {
 	})
 }
 
+// GetMe godoc
+// @Summary Get my profile
+// @Description Get my profile
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{} "Profile successfully retrieved"
+// @Router /user/me [get]
 func GetMe(c *gin.Context) {
 	db, err := helpers.OpenDatabase()
 	if err != nil {
@@ -131,13 +174,26 @@ func GetMe(c *gin.Context) {
 	result := db.Model(&models.User{}).Select("id, username, created_at, profile_image").First(&userFullInfo, userInfo.UserID)
 
 	if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get profile"})
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "User profile not found."})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error. Please try again later."})
+		}
 		return
 	}
 
 	c.JSON(http.StatusOK, userFullInfo)
 }
 
+// GetMe godoc
+// @Summary Get my profile
+// @Description Get my profile
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param id path int true "userID"
+// @Success 200 {object} map[string]interface{} "Profile successfully retrieved"
+// @Router /user/:id [get]
 func GetUser(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -158,7 +214,11 @@ func GetUser(c *gin.Context) {
 		First(&userFullInfo, id)
 
 	if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get profile"})
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "User profile not found."})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error. Please try again later."})
+		}
 		return
 	}
 

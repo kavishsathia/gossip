@@ -10,6 +10,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// EditThreadComment godoc
+// @Summary Edits a comment
+// @Description Edits a  comment
+// @Tags comments
+// @Accept json
+// @Produce json
+// @Param comment body comment_types.CommentCreationForm true "Comment payload"
+// @Param id path int true "commentID"
+// @Success 200 {object} map[string]boolean "Comment successfully edited"
+// @Failure 400 {object} map[string]string "Invalid request"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /comment/:id [put]
 func EditThreadComment(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -45,7 +57,7 @@ func EditThreadComment(c *gin.Context) {
 	}
 
 	if result.RowsAffected == 0 {
-		c.JSON(http.StatusForbidden, gin.H{"error": "Failed to delete comment"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Comment not found"})
 		return
 	}
 

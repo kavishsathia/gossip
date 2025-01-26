@@ -12,6 +12,11 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
+	"backend/docs"
+
+	swaggerFiles "github.com/swaggo/files"
 )
 
 func AuthMiddleware() gin.HandlerFunc {
@@ -25,7 +30,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		user, err := helpers.Verify(token.Value)
+		user, err := helpers.VerifyJWT(token.Value)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"error": "Unauthorized: " + err.Error(),
@@ -80,11 +85,9 @@ func main() {
 		protected.GET("/thread/:id/comments", comments.ListThreadComments)
 		protected.POST("/thread/:id/comment", comments.CreateThreadComment)
 		protected.PUT("/comment/:id", comments.EditThreadComment)
-
 		protected.GET("/comment/:id/comments", comments.ListThreadCommentComments)
 		protected.POST("/comment/:id/comment", comments.CreateThreadCommentComment)
 		protected.DELETE("/comment/:id", comments.DeleteThreadComment)
-
 		protected.POST("/comment/:id/like", comments.LikeThreadComment)
 		protected.DELETE("/comment/:id/like", comments.UnlikeThreadComment)
 
@@ -93,6 +96,12 @@ func main() {
 		protected.GET("/user/me", auth.GetMe)
 		protected.GET("/user/:id", auth.GetUser)
 	}
+
+	docs.SwaggerInfo.Title = "Uniconn API Documentation"
+	docs.SwaggerInfo.Description = `Use this documentation as a reference for implementing frontend features 
+		that interact with this backend system.`
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	r.Run(":80")
 }

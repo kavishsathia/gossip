@@ -10,6 +10,17 @@ import (
 	"gorm.io/gorm"
 )
 
+// CreateThread godoc
+// @Summary Create a new thread
+// @Description Creates a new discussion thread
+// @Tags threads
+// @Accept json
+// @Produce json
+// @Param thread body thread_types.ThreadCreationForm true "Thread creation payload"
+// @Success 200 {object} map[string]interface{} "Thread successfully created"
+// @Failure 400 {object} map[string]string "Invalid request body"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /thread [post]
 func CreateThread(c *gin.Context) {
 	var body thread_types.ThreadCreationForm
 
@@ -30,13 +41,15 @@ func CreateThread(c *gin.Context) {
 		return
 	}
 
-	flag, err := helpers.Moderate(c, body.Body)
+	// Moderate the thread
+	moderationFlag, err := helpers.Moderate(c, body.Body)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to moderate"})
 		return
 	}
 
+	// Generate the description
 	description, err := helpers.GenerateDescription(c, body.Body)
 
 	if err != nil {
@@ -44,6 +57,7 @@ func CreateThread(c *gin.Context) {
 		return
 	}
 
+	// Do the fact checking
 	corrections, err := helpers.GenerateCorrections(c, body.Body)
 
 	if err != nil {
@@ -59,25 +73,27 @@ func CreateThread(c *gin.Context) {
 		Likes:          0,
 		Comments:       0,
 		Shares:         0,
-		ModerationFlag: flag,
+		ModerationFlag: moderationFlag,
 	}
 
-	result := db.Create(thread)
+	createThreadResult := db.Create(thread)
 
-	if result.Error != nil {
+	if createThreadResult.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create thread"})
 		return
 	}
 
-	result2 := db.Model(&models.User{}).
+	// Update the user's post count
+	userCountUpdateResult := db.Model(&models.User{}).
 		Where("id = ?", uint(userInfo.UserID)).
 		Update("posts", gorm.Expr("posts + ?", 1))
 
-	if result2.Error != nil {
+	if userCountUpdateResult.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create thread"})
 		return
 	}
 
+	// Add the tags
 	for _, value := range body.Tags {
 		db.Create(&models.ThreadTag{
 			ThreadID: thread.ID,
@@ -85,6 +101,7 @@ func CreateThread(c *gin.Context) {
 		})
 	}
 
+	// Add the corrections
 	for _, value := range corrections {
 		db.Create(&models.ThreadCorrection{
 			ThreadID:   thread.ID,

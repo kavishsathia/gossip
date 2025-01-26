@@ -10,6 +10,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetThread godoc
+// @Summary Get a thread
+// @Description Get a thread
+// @Tags threads
+// @Accept json
+// @Produce json
+// @Param id path int true "ID"
+// @Success 200 {object} thread_types.ThreadResponse "Thread successfully retrieved"
+// @Failure 400 {object} map[string]string "Invalid request"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /thread/:id [get]
 func GetThread(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -30,7 +41,7 @@ func GetThread(c *gin.Context) {
 	}
 
 	var thread thread_types.ThreadResponse
-	result := db.Model(&models.Thread{}).
+	getThreadResult := db.Model(&models.Thread{}).
 		Select(`
         threads.id, 
         title, 
@@ -56,14 +67,14 @@ func GetThread(c *gin.Context) {
 		Preload("ThreadCorrections").
 		First(&thread, id)
 
-	if result.Error != nil {
+	if getThreadResult.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to like thread"})
 		return
 	}
 
 	var liked models.ThreadLike
-	result2 := db.Where("user_id = ? AND thread_id = ?", userInfo.UserID, id).First(&liked)
-	if result2.Error != nil {
+	getThreadLikeResult := db.Where("user_id = ? AND thread_id = ?", userInfo.UserID, id).First(&liked)
+	if getThreadLikeResult.Error != nil {
 		c.JSON(http.StatusOK, thread_types.ThreadResponse{
 			Thread:       thread.Thread,
 			Username:     thread.Username,
