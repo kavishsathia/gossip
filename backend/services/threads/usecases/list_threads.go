@@ -52,7 +52,9 @@ func ListThreads(c *gin.Context, db *gorm.DB, userInfo *helpers.User,
 	}
 
 	if search != "" {
-		query = query.Where("threads.title ILIKE ?", "%"+search+"%")
+		query = query.Where("threads.title ILIKE ? OR threads.body ILIKE ?",
+			"%"+search+"%",
+			"%"+search+"%")
 	}
 
 	result := query.
