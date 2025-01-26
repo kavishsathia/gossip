@@ -1,5 +1,5 @@
 import { useSearchParams } from "react-router";
-import BRSpeedDial from "./BRSpeedDial";
+import BRSpeedDial from "./CreateSpeedDial";
 import { Ghost } from "lucide-react";
 
 function Error() {

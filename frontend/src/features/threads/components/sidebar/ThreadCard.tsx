@@ -5,7 +5,7 @@ import {
   CardMedia,
   IconButton,
 } from "@mui/material";
-import { Thread } from "../../../services/threads/types";
+import { Thread } from "../../../../services/threads/types";
 import { Heart, MessageCircle, Share2 } from "lucide-react";
 import { Link, useSearchParams, useParams } from "react-router";
 import { useEffect } from "react";

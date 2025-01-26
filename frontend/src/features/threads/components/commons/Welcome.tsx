@@ -1,4 +1,4 @@
-import BRSpeedDial from "./BRSpeedDial";
+import BRSpeedDial from "../commons/CreateSpeedDial";
 
 function Welcome() {
   return (

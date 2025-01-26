@@ -1,8 +1,8 @@
 import { CircularProgress, InputAdornment, TextField } from "@mui/material";
 import * as React from "react";
-import { listThreads } from "../../../services/threads";
-import { Thread } from "../../../services/threads/types";
-import ThreadCard from "../components/ThreadCard";
+import { listThreads } from "../../../../services/threads";
+import { Thread } from "../../../../services/threads/types";
+import ThreadCard from "./ThreadCard";
 import { useSearchParams } from "react-router";
 import { Ghost } from "lucide-react";
 

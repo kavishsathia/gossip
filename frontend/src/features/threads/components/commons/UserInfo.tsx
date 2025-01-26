@@ -1,9 +1,9 @@
 import { Avatar, Box, Button, Modal, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { getUser } from "../../../services/auth";
-import { Profile } from "../../../services/auth/types";
-import { dateTranslate } from "./Thread";
+import { getUser } from "../../../../services/auth";
+import { Profile } from "../../../../services/auth/types";
 import { useSearchParams } from "react-router";
+import { dateTranslate } from "./DatetimeHelper";
 
 function App({ username, userId }: { username: string; userId: number }) {
   const [open, setOpen] = useState(false);

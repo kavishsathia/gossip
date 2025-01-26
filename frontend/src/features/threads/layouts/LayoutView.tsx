@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
-import Sidebar from "../components/Sidebar";
-import { Link, Outlet } from "react-router";
-import { signOut, getMe } from "../../../services/auth";
+import Sidebar from "../components/sidebar";
+import { Outlet } from "react-router";
+import { getMe } from "../../../services/auth";
 import { Profile } from "../../../services/auth/types";
 import { useSnackbar } from "notistack";
-import { LogOut } from "lucide-react";
-import { Avatar } from "@mui/material";
 import { User } from "../context";
 import { getNotifications } from "../../../services/notifications";
+import TopBar from "../components/topbar";
 
 function App() {
   const [me, setMe] = useState<Profile>();
@@ -41,23 +40,7 @@ function App() {
   return (
     <User.Provider value={me}>
       <div className="w-screen h-screen bg-neutral-50 flex flex-col">
-        <div className="h-12 w-full flex justify-between items-center border-b-2 border-neutral-200 flex-shrink-0 px-5 bg-teal-700">
-          <LogOut
-            onClick={() => {
-              if (confirm("Are you sure you want to sign out?")) {
-                signOut();
-              }
-            }}
-            className="rotate-180 text-white cursor-pointer"
-          />
-          <Link to="/">
-            <img className="h-6 w-auto" src="/logo.png" alt="Logo" />
-          </Link>
-          <Avatar
-            src={me?.ProfileImage}
-            sx={{ width: "35px", height: "35px" }}
-          ></Avatar>
-        </div>
+        <TopBar me={me} />
 
         <div className="w-full grid grid-cols-6 flex-1 overflow-hidden overscroll-contain">
           <div className="border-r col-span-2 border-gray-50 hidden lg:block">

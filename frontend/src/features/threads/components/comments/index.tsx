@@ -5,10 +5,10 @@ import {
   createThreadCommentComment,
   listThreadCommentComments,
   listThreadComments,
-} from "../../../services/comments";
+} from "../../../../services/comments";
 import React from "react";
-import { ThreadComment } from "../../../services/comments/types";
-import Comment from "../components/Comment";
+import { ThreadComment } from "../../../../services/comments/types";
+import Comment from "./Comment";
 import { TextField } from "@mui/material";
 
 function App({ id, isFromPost }: { id: number | null; isFromPost: boolean }) {
@@ -57,8 +57,8 @@ function App({ id, isFromPost }: { id: number | null; isFromPost: boolean }) {
         ></TextField>
       </div>
       <div className="mt-6">
-        {comments?.map((item, index) => (
-          <Comment key={index} item={item} index={index}></Comment>
+        {comments?.map((comment, index) => (
+          <Comment key={index} comment={comment} index={index}></Comment>
         ))}
       </div>
     </div>

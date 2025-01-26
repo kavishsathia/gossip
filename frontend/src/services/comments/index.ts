@@ -1,12 +1,22 @@
 import { baseURL, request } from "..";
 import { ThreadComment } from "./types";
 
+/**
+ *
+ * @param id the id of the thread
+ * @returns the list of the thread comments
+ */
 export async function listThreadComments(id: number): Promise<ThreadComment[]> {
   const response = await request(`${baseURL}/thread/${id}/comments`);
   const json = await response.json();
   return json;
 }
 
+/**
+ *
+ * @param id the id of the comment
+ * @returns the list of comments
+ */
 export async function listThreadCommentComments(
   id: number
 ): Promise<ThreadComment[]> {
@@ -15,6 +25,12 @@ export async function listThreadCommentComments(
   return json;
 }
 
+/**
+ *
+ * @param id the id of the thread
+ * @param body the comment body
+ * @returns true if the comment was created
+ */
 export async function createThreadComment(
   id: number,
   body: string
@@ -31,6 +47,12 @@ export async function createThreadComment(
   return response.status === 200;
 }
 
+/**
+ *
+ * @param id the id of the comment
+ * @param body the comment body
+ * @returns true if the comment was created
+ */
 export async function createThreadCommentComment(
   id: number,
   body: string
@@ -47,30 +69,48 @@ export async function createThreadCommentComment(
   return response.status === 200;
 }
 
-export async function likeThreadComment(id: number): Promise<Comment> {
+/**
+ *
+ * @param id the id of the comment
+ * @returns true if the like was registered
+ */
+export async function likeThreadComment(id: number): Promise<boolean> {
   const response = await request(`${baseURL}/comment/${id}/like`, {
     method: "POST",
   });
-  const json = await response.json();
-  return json;
+  return response.status === 200;
 }
 
-export async function unlikeThreadComment(id: number): Promise<Comment> {
+/**
+ *
+ * @param id the id of the comment
+ * @returns true if the like was removed
+ */
+export async function unlikeThreadComment(id: number): Promise<boolean> {
   const response = await request(`${baseURL}/comment/${id}/like`, {
     method: "DELETE",
   });
-  const json = await response.json();
-  return json;
+  return response.status === 200;
 }
 
-export async function deleteThreadComment(id: number): Promise<Comment> {
+/**
+ *
+ * @param id the id of the comment
+ * @returns true if the comment was deleted
+ */
+export async function deleteThreadComment(id: number): Promise<boolean> {
   const response = await request(`${baseURL}/comment/${id}`, {
     method: "DELETE",
   });
-  const json = await response.json();
-  return json;
+  return response.status === 200;
 }
 
+/**
+ *
+ * @param id the id of the comment
+ * @param body the comment body
+ * @returns the comment
+ */
 export async function editThreadComment(
   id: number,
   body: string
