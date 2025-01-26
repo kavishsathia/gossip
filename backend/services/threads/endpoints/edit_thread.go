@@ -2,8 +2,9 @@ package endpoints
 
 import (
 	"backend/helpers"
-	"backend/models"
 	"backend/services/threads/thread_types"
+	"backend/services/threads/usecases"
+	"backend/services/threads/validators"
 	"net/http"
 	"strconv"
 
@@ -47,49 +48,10 @@ func EditThread(c *gin.Context) {
 		return
 	}
 
-	// Generate the description
-	description, err := helpers.GenerateDescription(c, body.Body)
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate description"})
+	if !validators.UserOwnsThread(id, userInfo.UserID) {
+		c.JSON(http.StatusForbidden, gin.H{"error": "You do not have write access to this thread"})
 		return
 	}
 
-	var thread models.Thread
-	editThreadResult := db.Model(&thread).
-		Where("id = ?", id).
-		Where("user_id = ?", userInfo.UserID).
-		Updates(map[string]interface{}{
-			"title":       body.Title,
-			"body":        body.Body,
-			"image":       body.Image,
-			"description": description,
-		})
-
-	if editThreadResult.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to edit thread"})
-		return
-	}
-
-	if editThreadResult.RowsAffected == 0 {
-		c.JSON(http.StatusForbidden, gin.H{"error": "Failed to edit thread"})
-		return
-	}
-
-	// Reset the tags and add them back
-	deleteTagsResult := db.Where("thread_id = ?", id).Delete(&models.ThreadTag{})
-
-	if deleteTagsResult.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to edit thread"})
-		return
-	}
-
-	for _, value := range body.Tags {
-		db.Create(&models.ThreadTag{
-			ThreadID: uint(id),
-			Tag:      value,
-		})
-	}
-
-	c.JSON(http.StatusOK, gin.H{"ThreadID": thread.ID})
+	usecases.EditThread(c, body, db, id, userInfo)
 }

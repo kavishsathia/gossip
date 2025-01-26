@@ -1,4 +1,4 @@
-package auth
+package auth_types
 
 type UserCreationForm struct {
 	Username string `json:"username"`

@@ -2,14 +2,13 @@ package endpoints
 
 import (
 	"backend/helpers"
-	"backend/models"
 	"backend/services/comments/comment_types"
-	"backend/services/notifications"
+	"backend/services/comments/usecases"
+	"backend/services/threads/validators"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
 // CreateThreadComment godoc
@@ -49,48 +48,10 @@ func CreateThreadComment(c *gin.Context) {
 		return
 	}
 
-	createCommentResult := db.Create(&models.ThreadComment{
-		ThreadID: uint(id),
-		Comment:  body.Body,
-		UserID:   uint(userInfo.UserID),
-		Likes:    0,
-		Comments: 0,
-		ParentID: nil,
-	})
-
-	if createCommentResult.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create comment"})
+	if !validators.ThreadExists(id) {
+		c.JSON(http.StatusNotFound, gin.H{"error": "This thread does not exist"})
 		return
 	}
 
-	// Updating the comment count on the thread
-	threadCountUpdateResult := db.Model(&models.Thread{}).
-		Where("id = ?", id).
-		Update("comments", gorm.Expr("comments + ?", 1))
-
-	if threadCountUpdateResult.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create comment"})
-		return
-	}
-
-	// Updating the comment count on the user
-	userCountUpdateResult := db.Model(&models.User{}).
-		Where("id = ?", uint(userInfo.UserID)).
-		Update("comments", gorm.Expr("comments + ?", 1))
-
-	if userCountUpdateResult.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create comment"})
-		return
-	}
-
-	var thread models.Thread
-	getThreadInfoResult := db.First(&thread, id)
-
-	if getThreadInfoResult.Error != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Thread not found"})
-	}
-
-	// Sending notifications to the user
-	notifications.SendNotification(c, int(thread.UserID), userInfo.Username+" commented on your thread", userInfo.UserID)
-	notifications.SendThreadInfo(c, int(thread.ID), "comment", 1)
+	usecases.CreateThreadComment(c, db, id, body, userInfo)
 }

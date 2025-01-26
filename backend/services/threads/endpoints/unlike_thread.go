@@ -2,13 +2,12 @@ package endpoints
 
 import (
 	"backend/helpers"
-	"backend/models"
-	"backend/services/notifications"
+	"backend/services/threads/usecases"
+	"backend/services/threads/validators"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
 // UnlikeThread godoc
@@ -41,25 +40,10 @@ func UnlikeThread(c *gin.Context) {
 		return
 	}
 
-	deleteLikeResult := db.Delete(&models.ThreadLike{
-		ThreadID: uint(id),
-		UserID:   uint(userInfo.UserID),
-	})
-
-	if deleteLikeResult.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to unlike thread"})
+	if !validators.ThreadExists(id) {
+		c.JSON(http.StatusNotFound, gin.H{"error": "This thread does not exist"})
 		return
 	}
 
-	threadCountUpdateResult := db.Model(&models.Thread{}).
-		Where("id = ?", id).
-		Update("likes", gorm.Expr("likes - ?", 1))
-
-	if threadCountUpdateResult.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to unlike thread"})
-		return
-	}
-
-	notifications.SendThreadInfo(c, id, "like", -1)
-	c.JSON(http.StatusOK, gin.H{"success": true})
+	usecases.UnlikeThread(c, db, id, userInfo)
 }

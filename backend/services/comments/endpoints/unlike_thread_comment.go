@@ -2,12 +2,12 @@ package endpoints
 
 import (
 	"backend/helpers"
-	"backend/models"
+	"backend/services/comments/usecases"
+	"backend/services/comments/validators"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
 // UnlikeThreadComment godoc
@@ -40,25 +40,10 @@ func UnlikeThreadComment(c *gin.Context) {
 		return
 	}
 
-	deleteThreadCommentLikeResult := db.Delete(&models.ThreadCommentLike{
-		CommentID: uint(id),
-		UserID:    uint(userInfo.UserID),
-	})
-
-	if deleteThreadCommentLikeResult.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to unlike comment"})
+	if !validators.CommentExists(id) {
+		c.JSON(http.StatusNotFound, gin.H{"error": "This comment does not exist"})
 		return
 	}
 
-	// Updating like count on the comment
-	commentCountUpdateResult := db.Model(&models.ThreadComment{}).
-		Where("id = ?", id).
-		Update("likes", gorm.Expr("likes - ?", 1))
-
-	if commentCountUpdateResult.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to unlike comment"})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"success": true})
+	usecases.UnlikeThreadComment(c, db, id, userInfo)
 }

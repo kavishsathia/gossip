@@ -2,13 +2,12 @@ package endpoints
 
 import (
 	"backend/helpers"
-	"backend/models"
-	"backend/services/notifications"
+	"backend/services/threads/usecases"
+	"backend/services/threads/validators"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
 // LikeThread godoc
@@ -41,33 +40,10 @@ func LikeThread(c *gin.Context) {
 		return
 	}
 
-	likeThreadResult := db.Create(&models.ThreadLike{
-		ThreadID: uint(id),
-		UserID:   uint(userInfo.UserID),
-	})
-
-	if likeThreadResult.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to like thread"})
+	if !validators.ThreadExists(id) {
+		c.JSON(http.StatusNotFound, gin.H{"error": "This thread does not exist"})
 		return
 	}
 
-	threadCountUpdateResult := db.Model(&models.Thread{}).
-		Where("id = ?", id).
-		Update("likes", gorm.Expr("likes + ?", 1))
-
-	if threadCountUpdateResult.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to like thread"})
-		return
-	}
-
-	var thread models.Thread
-	getThreadInfoResult := db.First(&thread, id)
-
-	if getThreadInfoResult.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to like thread"})
-	}
-
-	notifications.SendNotification(c, int(thread.UserID), userInfo.Username+" liked your thread", userInfo.UserID)
-	notifications.SendThreadInfo(c, int(thread.ID), "like", 1)
-	c.JSON(http.StatusOK, gin.H{"success": true})
+	usecases.LikeThread(c, db, id, userInfo)
 }

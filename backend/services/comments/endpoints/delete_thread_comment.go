@@ -2,7 +2,8 @@ package endpoints
 
 import (
 	"backend/helpers"
-	"backend/models"
+	"backend/services/comments/usecases"
+	"backend/services/comments/validators"
 	"net/http"
 	"strconv"
 
@@ -39,21 +40,10 @@ func DeleteThreadComment(c *gin.Context) {
 		return
 	}
 
-	result := db.Model(&models.ThreadComment{}).
-		Where("id = ?", id).
-		Where("user_id = ?", userInfo.UserID).
-		Update("deleted", true).
-		Update("comment", "[deleted]")
-
-	if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete comment"})
+	if !validators.UserOwnsComment(id, userInfo.UserID) {
+		c.JSON(http.StatusForbidden, gin.H{"error": "You do not have write access to this comment"})
 		return
 	}
 
-	if result.RowsAffected == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Comment not found"})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"success": true})
+	usecases.DeleteThreadComment(c, db, id, userInfo)
 }

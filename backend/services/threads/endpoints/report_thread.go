@@ -2,7 +2,8 @@ package endpoints
 
 import (
 	"backend/helpers"
-	"backend/models"
+	"backend/services/threads/usecases"
+	"backend/services/threads/validators"
 	"net/http"
 	"strconv"
 
@@ -39,10 +40,10 @@ func ReportThread(c *gin.Context) {
 		return
 	}
 
-	db.Create(&models.CommunityFlag{
-		ThreadID: uint(id),
-		UserID:   uint(userInfo.UserID),
-	})
+	if !validators.ThreadExists(id) {
+		c.JSON(http.StatusNotFound, gin.H{"error": "This thread does not exist"})
+		return
+	}
 
-	c.JSON(http.StatusOK, gin.H{"success": true})
+	usecases.ReportThread(c, db, id, userInfo)
 }
