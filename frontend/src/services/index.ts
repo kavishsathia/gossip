@@ -5,6 +5,7 @@ export const request = async (input: RequestInfo | URL, init?: RequestInit) => {
   const response = await fetch(input, { ...init, credentials: "include" });
   if (response.status === 401) {
     if (
+      (await response.json()).error === "Unauthorized: Lurking" &&
       confirm(`
       You are lurking, too make changes please log in. 
       Do you want to be redirected to the login page?

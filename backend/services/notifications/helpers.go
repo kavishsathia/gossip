@@ -9,6 +9,9 @@ import (
 )
 
 func SendNotification(c *gin.Context, userId int, message string, origin int) {
+	// By right, this should be done individually in each endpoint
+	// but this works too
+	helpers.IncrementAura(userId)
 	if origin == userId {
 		return
 	}

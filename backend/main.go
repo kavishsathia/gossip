@@ -42,7 +42,7 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		if user.UserID == 0 && c.Request.Method != "GET" {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"error": "Unauthorized: You're lurking lol",
+				"error": "Unauthorized: Lurking",
 			})
 		}
 
