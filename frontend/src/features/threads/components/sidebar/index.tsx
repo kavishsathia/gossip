@@ -1,4 +1,9 @@
-import { CircularProgress, InputAdornment, TextField } from "@mui/material";
+import {
+  Button,
+  CircularProgress,
+  InputAdornment,
+  TextField,
+} from "@mui/material";
 import * as React from "react";
 import { listThreads } from "../../../../services/threads";
 import { Thread } from "../../../../services/threads/types";
@@ -12,6 +17,7 @@ function App() {
   const [threads, setThreads] = React.useState<Thread[]>([]);
   const [, setSearch] = React.useState<string>(search);
   const [loading, setLoading] = React.useState<boolean>(false);
+  const [page, setPage] = React.useState(1);
 
   document.addEventListener("keydown", (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === "k") {
@@ -22,7 +28,7 @@ function App() {
 
   React.useEffect(() => {
     const fetchThreads = async () => {
-      const data = await listThreads(encodeURIComponent(search));
+      const data = await listThreads(search, 1);
       setThreads(data);
       setLoading(false);
     };
@@ -79,6 +85,27 @@ function App() {
               <ThreadCard item={item} />
             </div>
           ))}
+          {page === 0 ? (
+            <div />
+          ) : (
+            <Button
+              onClick={async () => {
+                const newThreads = await listThreads(search, page + 1);
+                setThreads(threads.concat(newThreads));
+
+                if (newThreads.length < 10) {
+                  setPage(0);
+                  return;
+                }
+
+                setPage(page + 1);
+              }}
+              fullWidth
+              variant="outlined"
+            >
+              Load more
+            </Button>
+          )}
         </div>
       )}
     </div>

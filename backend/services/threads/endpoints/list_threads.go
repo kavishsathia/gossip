@@ -4,6 +4,7 @@ import (
 	"backend/helpers"
 	"backend/services/threads/usecases"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -21,6 +22,12 @@ import (
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /threads [get]
 func ListThreads(c *gin.Context) {
+	page, err := strconv.Atoi(c.Query("page"))
+
+	if err != nil {
+		page = 1
+	}
+
 	var queries = strings.Split(c.Query("query"), " ")
 	var search = ""
 	var tags []string
@@ -52,5 +59,5 @@ func ListThreads(c *gin.Context) {
 		return
 	}
 
-	usecases.ListThreads(c, db, userInfo, tags, people, search)
+	usecases.ListThreads(c, db, userInfo, tags, people, search, page)
 }

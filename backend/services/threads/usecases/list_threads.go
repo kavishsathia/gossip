@@ -10,7 +10,8 @@ import (
 	"gorm.io/gorm"
 )
 
-func ListThreads(c *gin.Context, db *gorm.DB, userInfo *helpers.User, tags []string, people []string, search string) {
+func ListThreads(c *gin.Context, db *gorm.DB, userInfo *helpers.User,
+	tags []string, people []string, search string, page int) {
 	var threads []thread_types.ThreadResponse
 
 	query := db.Debug().Model(&models.Thread{}).
@@ -54,7 +55,10 @@ func ListThreads(c *gin.Context, db *gorm.DB, userInfo *helpers.User, tags []str
 		query = query.Where("threads.title ILIKE ?", "%"+search+"%")
 	}
 
-	result := query.Find(&threads)
+	result := query.
+		Limit(10).
+		Offset((page - 1) * 10).
+		Find(&threads)
 
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch threads"})

@@ -6,8 +6,15 @@ import { Thread } from "./types";
  * @param query the search string
  * @returns a list of threads
  */
-export async function listThreads(query: string): Promise<Thread[]> {
-  const response = await request(`${baseURL}/threads?query=${query}`);
+export async function listThreads(
+  query: string,
+  page: number = 1
+): Promise<Thread[]> {
+  const response = await request(
+    `${baseURL}/threads?query=${encodeURIComponent(
+      query
+    )}&page=${encodeURIComponent(page)}`
+  );
   const json = await response.json();
   return json;
 }
