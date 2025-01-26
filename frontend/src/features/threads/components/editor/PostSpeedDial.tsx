@@ -1,6 +1,8 @@
 import SpeedDial from "@mui/material/SpeedDial";
 import { editThread, postThread } from "../../../../services/threads";
 import { Check } from "lucide-react";
+import { useState } from "react";
+import { CircularProgress } from "@mui/material";
 
 export default function BRSpeedDial({
   id,
@@ -15,10 +17,13 @@ export default function BRSpeedDial({
   tags: string[];
   image: string;
 }) {
+  const [loading, setLoading] = useState(false);
+
   return (
     <SpeedDial
       ariaLabel="SpeedDial basic example"
       onClick={async () => {
+        setLoading(true);
         if (id) {
           await editThread(id, title, markdown, tags, image);
           window.location.href = `/thread/${id}`;
@@ -41,7 +46,7 @@ export default function BRSpeedDial({
           backgroundColor: "rgb(13 148 136 / var(--tw-bg-opacity, 1))",
         },
       }}
-      icon={<Check />}
+      icon={loading ? <CircularProgress sx={{ color: "white" }} /> : <Check />}
     ></SpeedDial>
   );
 }
