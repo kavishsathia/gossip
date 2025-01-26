@@ -14,6 +14,7 @@ import Corrections from "./Corrections";
 import EditorToolbox from "./EditorToolbox";
 import InteractionBar from "./InteractionBar";
 import TagList from "./TagList";
+import AuthorInfo from "./AuthorInfo";
 
 function App() {
   const id = Number(useParams().id);
@@ -77,6 +78,8 @@ function App() {
           editable={false}
         />
       )}
+
+      <AuthorInfo thread={thread} />
 
       <TagList thread={thread} />
 
