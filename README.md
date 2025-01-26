@@ -5,8 +5,6 @@
   [![Netlify Status](https://api.netlify.com/api/v1/badges/f8790419-0f6c-4023-baf0-ac9bb15e8179/deploy-status)](https://app.netlify.com/sites/uniconnweb/deploys)
 </div>
 
-
-
 <div align="center">
 <h1>Uniconn: My Implementation of a Simple Web Forum Application</h1>
 
@@ -26,10 +24,9 @@
 - [User Interface](#user-interface)
 - [Data Model](#data-model)
 - [Architecture](#architecture)
-  - [Real-Time Notification System](#real-time-notification-system)
-- [Challenges](#challenges)
 - [Developer Manual](#developer-manual)
-- [Appreciation](#appreciation)
+- [Developer Manual](#user-manual)
+- [Accomplishments](#accomplishments)
 
 <br>
 
@@ -40,17 +37,19 @@ These are the features that I have included in Uniconn. To try out these feature
 - Account-based authentication with JWT stored in an HTTP Cookie.
 - Write threads using markdown and include a thumbnail picture for more engagement.
 - Real-time notifications when the user's thread or comment is liked or commented on.
-- Nested comments (up to 5 levels).
+- Nested comments.
 - Mobile responsiveness.
 - Progressive web app (allowing users to install the web app onto their devices).
 - Searching for forums based on title, description, tags, and author username.
 - A point system (Aura) that will increase when a user's thread or comment gets liked, incentivizing participation.
+- Content moderation using AI and community feedback.
+- AI-generated descriptions for threads.
+- Fact checking for threads
 
 ### Planned or In-Progress Features
 
-- Content moderation using AI and community feedback.
-- AI-generated descriptions for threads.
 - Communities feature with each community having its own theme and color scheme.
+- Include tests in future versions
 
 <br>
 
@@ -91,9 +90,10 @@ There are 4 interfaces for larger screens and 5 interfaces for smaller screens. 
 ## Data Model
 
 <div align="center">
-<img width="1080" alt="data_model" src="https://github.com/user-attachments/assets/fc3edd3a-a598-4d0f-b739-e562bad081f0" />
-  
-*Figure: The ERD diagram for Uniconn's relational database.*
+<img width="1028" alt="data_model(1)" src="https://github.com/user-attachments/assets/b1f907d0-40da-4605-b84c-629b7c01fc2b" />
+
+_Figure: The ERD diagram for Uniconn's relational database._
+
 </div>
 
 <br>
@@ -101,9 +101,10 @@ There are 4 interfaces for larger screens and 5 interfaces for smaller screens. 
 ## Architecture
 
 <div align="center">
-<img width="601" alt="architecture" src="https://github.com/user-attachments/assets/8bdd8aa7-3c2e-40de-aff5-7bed5962d037" />
-  
-*Figure: The tech architecture for Uniconn.*
+<img width="920" alt="architecture(1)" src="https://github.com/user-attachments/assets/8ca0f41f-2284-4327-ac71-c124f5c9ad5a" />
+
+_Figure: The tech architecture for Uniconn._
+
 </div>
 
 The architecture consists of 3 segments: the frontend which is hosted on Netlify,
@@ -117,18 +118,15 @@ corresponds to the user. If the user is connected to the WebSocket endpoint on t
 backend, the WebSocket endpoint will read the published message and send it to the user
 through the Websocket connection. When the frontend receives the message, it will display a notification.
 
+As for the moderation feature, I used the free service from OpenAI
+to moderate posts based on a few categories. The description and the fact checking is done using the
+GPT-4o-mini model from OpenAI.
+
 <br>
 
-## Challenges
+## API documentation
 
-1. **Cross-Origin Auth Cookie**:  
-   Different browsers handle these cookies differently. Initially, the cookie only worked on Firefox, and after some adjustments, it now works on Chrome as well. However, it still does not work on Safari.
-
-2. **UI/UX Design**:  
-   I am not very proficient in frontend design, so it took time to get the UI/UX (sort of?) right. I have settled on a decent design for now but might update it later.
-
-3. **Code Quality**:  
-   The current code looks like it was written by a competitive programmer (I am not one) `\s`. Over the next two weeks, I plan to refactor the codebase and follow SOLID principles to improve code quality.
+<a href="https://gossip.s6wyfaw6z9q0r.ap-southeast-1.cs.amazonlightsail.com/swagger/index.html">Go to the Swagger documentation generated with OpenAPI specs.</a>
 
 <br>
 
@@ -152,15 +150,13 @@ cd gossip/backend
 go mod download
 ```
 
-4. Add a .env file. In the .env file, add the following:
+4. Copy the text in the .env.example file into your .env file for both your frontend and backend.
 
-   - DATABASE_URL
-   - JWT_SECRET
-   - REDIS_URL
-   - REDIS_PWD
-   - REDIS_USERNAME
+5. Start a Postgres server locally or on NeonDB (neon.tech). Start a redis-server locally by running the redis-server command. If not found, download the CLI.
 
-5. Start the server. Run:
+6. Fill up the .env file with the relevant environment variables. You can get your OpenAI API key from the Open AI console.
+
+7. Start the server. Run:
 
 ```console
 go run .
@@ -190,6 +186,49 @@ npm run dev
 
 <br>
 
-## Appreciation
+## User Manual
 
-Thanks to the CVWO Team for this awesome assignment. Although I had some previous experience, this assignment allowed me to fill in the gaps in my knowledge and push my boundaries.
+1. How to create a new account? Click on sign up on the login page.
+2. Can I view posts without signing up? Yes, you can! Just click on ”Lurk” on the login page, however
+   if you try to like or comment, you will be redirected to the login page.
+3. How to search for posts? Use the search bar on the left sidebar.
+4. How to search by tags and author username? Add ”#” in front of tags and ”@” in front of
+   usernames when searching in the search bar. For example, to find all posts written by me with the
+   ”nus” tag and contains the word ”CS”, you can search ”@kavish #nus cs”.
+5. Is there a quicker way to search by tags and username? Yes, you can click on the tags in the posts
+   and click on the author username in the posts (then you will be shown a modal in which ”View
+   their Threads” is an option”)
+6. How to view a thread? Click on any of the threads in the left sidebar.
+7. How to view comments? Scroll down and you will see comments if there are any. You can view
+   nested comments by clicking on ”Show replies”, and you will also be presented with text input to
+   reply to that comment.
+8. How to write comments? Simply fill in the text input at the bottom of the thread and Enter to
+   post the comment.
+9. How to like threads and comments? Click on the heart button, if you are being redirected to the
+   login page, it means you are lurking.
+10. How to create my own thread? Click on the ”Plus” button at the bottom right of the page. An
+    editor page will open up. You can submit a URL for the thumbnail picture. You can change the
+    title by editing the ”Untitled Thread” text. You can also add more tags by clicking on ”Add tag”
+    or the ”X” button next to the tags. The body of the post can be edited within the markdown
+    editor. After you’re done, click on the tick button on the bottom right corner.
+11. How do I edit my thread or comment? For your own threads and comments, you will see a pencil
+    icon on the top right corner. Click on that to edit. For threads, the familiar markdown editor
+    will open up, and after you’re done, click on the tick button. For comments, an ”Edit” button
+    will replace the pencil icon on the top right corner, and the comment text will be replaced with a
+    textarea. Simply edit the text in the textarea and click on the ”Edit” button.
+12. How to delete comments and threads? Click on the trash icon next to the pencil icon.
+13. How to report threads? Click on the ”Report” button if it appears on the top of the thread. It
+    will only appear if the thread has been flagged by the moderation service.
+
+<br />
+
+## Accomplishments
+
+This is my first (almost) complete open-source project on GitHub, and it has been a game-changer for
+me as a programmer. Through this project, I learned so much that I genuinely feel like I’ve leveled up.
+One of the biggest challenges was setting up the markdown editor and deploying the application as a
+container on AWS Lightsail (tasks that initially took me around 5 hours and a full day respectively).
+More recently though, when I had to do the same for Hack&Roll 2025 (a hackathon), I broke my personal
+best, configuring the Markdown editor in just 10 minutes and deploying to AWS Lightsail in 15 minutes.
+These improvements contributed vastly to my team winning at the hackathon, and I owe a huge thanks
+to the CVWO team for helping me hone my skills along the way.
