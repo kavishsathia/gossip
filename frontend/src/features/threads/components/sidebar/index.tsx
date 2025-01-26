@@ -49,6 +49,7 @@ function App() {
           fullWidth
           size="small"
           onChange={async (e) => {
+            setPage(1);
             setLoading(true);
             setSearch(e.target.value);
             setSearchParams({ ["search"]: e.target.value });
