@@ -85,27 +85,17 @@ function App() {
               <ThreadCard item={item} />
             </div>
           ))}
-          {page === 0 ? (
-            <div />
-          ) : (
-            <Button
-              onClick={async () => {
-                const newThreads = await listThreads(search, page + 1);
-                setThreads(threads.concat(newThreads));
-
-                if (newThreads.length < 10) {
-                  setPage(0);
-                  return;
-                }
-
-                setPage(page + 1);
-              }}
-              fullWidth
-              variant="outlined"
-            >
-              Load more
-            </Button>
-          )}
+          <Button
+            onClick={async () => {
+              const newThreads = await listThreads(search, page + 1);
+              setThreads(threads.concat(newThreads));
+              setPage(page + 1);
+            }}
+            fullWidth
+            variant="outlined"
+          >
+            Load more
+          </Button>
         </div>
       )}
     </div>
